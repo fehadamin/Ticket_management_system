@@ -1,9 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1" import="java.util.*,com.ticket.entity.*"%>
+	pageEncoding="ISO-8859-1" import="java.util.*,com.ticket.entity.*,com.ticket.models.*"%>
 <%
 	ServletContext ctx = getServletContext();
 	String Url = ctx.getInitParameter("url");
 	String viewpath = ctx.getInitParameter("viewpath");
+	ProductModel pm = new ProductModel();
 %>
 
 
@@ -27,6 +28,7 @@
 		<%
 			List<Product> products = (ArrayList) request.getAttribute("products");
 			for (Product d : products) {
+				
 		%>
 
 		<tr>
@@ -39,7 +41,8 @@
 						}
 					else
 					{
-						out.println(d.getParent());	
+						Product parent= pm.getById(d.getParent());
+						out.println(parent.getProductName());	
 					}
 				%>
 			</td>

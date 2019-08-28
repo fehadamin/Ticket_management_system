@@ -2,11 +2,11 @@
 	pageEncoding="ISO-8859-1"
 	import="java.util.*,com.ticket.entity.*"%>
 <%
-    	ServletContext ctx = getServletContext();
-    	String Url= ctx.getInitParameter("url");
-    	String viewpath=ctx.getInitParameter("viewpath");
-    	 List<Department> departments = (ArrayList)request.getAttribute("departments");  
-    %>
+   	ServletContext ctx = getServletContext();
+   	String Url= ctx.getInitParameter("url");
+   	String viewpath=ctx.getInitParameter("viewpath");
+   	 List<Department> departments = (ArrayList)request.getAttribute("departments");  
+%>
 
 <form action="admin-employee-store.htm" method="POST"
 	onsubmit=" return employee_validation();">
@@ -41,7 +41,7 @@
 		</div>
 		<div class="form-group">
 			<label>Department <span class="alert">*</span></label> <select
-				class="form-control" name="role" id="department" required>
+				class="form-control" name="department" id="department" required>
 				<% for(Department d:departments){ %>
 					<option value="<%=d.getDepartmentId()%>"><%=d.getDepartmentName() %></option>
 				<%} %>
@@ -55,8 +55,8 @@
 				<option value="employee">Employee</option>
 			</select>
 		</div>
-		<br> <input type="submit" name="submit" class="form-btn"
-			value="create User">
+		<br>
+		<input type="submit" name="submit" class="form-btn" value="create User">
 		
 	<div id="eresult2" style="color: firebrick; display: block;"></div>
 	</div>

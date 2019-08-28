@@ -1406,6 +1406,8 @@ public class FrontController extends HttpServlet {
 				u.setHomeCompany(request.getParameter("homecompany"));
 				u.setRole(request.getParameter("role"));
 				int flag = 0;
+				
+				System.out.println(request.getParameter("role"));
 				try {
 
 					uModel.addUser(u);
