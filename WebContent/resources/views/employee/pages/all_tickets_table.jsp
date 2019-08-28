@@ -77,7 +77,18 @@
 				<tr>
 					<td><%=t.getTicketKey()%></td> 
 						<td><%=tt.getTicketName()%></td>
-						<td><%=p.getProductName()%></td>
+						<td><% if(t.getProductId() == 0 ){
+							/* out.println(t.getProducts()); */
+							 String[] ids = t.getProducts().split(",",-2);
+							for(String id:ids){
+								p = pm.getById(Integer.parseInt(""+id.charAt(0)));
+								out.println(p.getProductName()+",");
+								
+							}
+						}else{
+							out.println(p.getProductName());
+						}
+						%></td>
 						<td><%=c.getProductName()%> </td>
 						<td><%=t.getSummary()%></td>
 						<td><%=t.getPriority()%></td>

@@ -15,9 +15,21 @@ public class Ticket {
 	private String dueDate;
 	private String created;
 	private String updated;
-	
+	private String products;
 
 	
+	public String getProducts() {
+		return products;
+	}
+
+
+
+	public void setProducts(String products) {
+		this.products = products;
+	}
+
+
+
 	public int getTicketId() {
 		return ticketId;
 	}
@@ -192,7 +204,11 @@ public class Ticket {
 				+ ", productId=" + productId + ", summary=" + summary + ", component=" + component + ", assignee="
 				+ assignee + ", reporter=" + reporter + ", priority=" + priority + ", status=" + status
 				+ ", resolution=" + resolution + ", dueDate=" + dueDate + ", created=" + created + ", updated="
-				+ updated + "]";
+				+ updated + ", products=" + products + "]";
 	}
+
+
+
+
 
 }

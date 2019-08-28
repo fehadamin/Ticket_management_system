@@ -52,6 +52,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setDueDate(result.getString("due_date"));
 				t.setStatus(result.getString("status"));
 				t.setComponent(result.getInt("component"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setCreated(result.getString("created"));
 				t.setUpdated(result.getString("updated"));
@@ -119,6 +120,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setPriority(result.getString("priority"));
 				t.setDueDate(result.getString("due_date"));
 				t.setStatus(result.getString("status"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setCreated(result.getString("created"));
 				t.setUpdated(result.getString("updated"));
@@ -198,12 +200,14 @@ public class TicketModel implements TicketDao,SqlQueries{
 			prep.setString(7, t.getPriority());
 			prep.setString(8, t.getStatus());
 			prep.setString(9, t.getResolution());
+			
 			Date due = format.parse(t.getDueDate());
 			java.sql.Date sDue = new java.sql.Date(due.getTime());
 			prep.setDate(10,sDue);
 			prep.setString(11, t.getCreated());
 			prep.setString(12, t.getUpdated());
 			prep.setInt(13, t.getComponent());
+			prep.setString(14, t.getProducts());
 			flag = prep.executeUpdate();
 			
 			result = prep.getGeneratedKeys();
@@ -240,6 +244,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setStatus(result.getString("status"));
 				t.setComponent(result.getInt("component"));
 				t.setDueDate(result.getString("due_date"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setCreated(result.getString("created"));
 				t.setUpdated(result.getString("updated"));
@@ -273,6 +278,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setPriority(result.getString("priority"));
 				t.setStatus(result.getString("status"));
 				t.setDueDate(result.getString("due_date"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setComponent(result.getInt("component"));
 				t.setCreated(result.getString("created"));
@@ -413,6 +419,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setStatus(result.getString("status"));
 				t.setComponent(result.getInt("component"));
 				t.setDueDate(result.getString("due_date"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setCreated(result.getString("created"));
 				t.setUpdated(result.getString("updated"));
@@ -448,6 +455,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setComponent(result.getInt("component"));
 				t.setStatus(result.getString("status"));
 				t.setDueDate(result.getString("due_date"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setCreated(result.getString("created"));
 				t.setUpdated(result.getString("updated"));
@@ -484,6 +492,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setStatus(result.getString("status"));
 				t.setDueDate(result.getString("due_date"));
 				t.setComponent(result.getInt("component"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setCreated(result.getString("created"));
 				t.setUpdated(result.getString("updated"));
@@ -519,6 +528,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				t.setStatus(result.getString("status"));
 				t.setComponent(result.getInt("component"));
 				t.setDueDate(result.getString("due_date"));
+				t.setProducts(result.getString("products"));
 				t.setResolution(result.getString("resolution"));
 				t.setCreated(result.getString("created"));
 				t.setUpdated(result.getString("updated"));

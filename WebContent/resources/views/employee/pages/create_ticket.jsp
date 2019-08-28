@@ -69,6 +69,15 @@
 					}
 				%>
 			</select>
+			<div id="pds" style="display:none;">
+				<%
+					for (Product d : products) {
+						if (d.getParent() == 0) {
+				%>
+					<lavel><%=d.getProductName()%></lavel>
+					<input type="checkbox" name="products" value="<%=d.getProductId()%>" />
+				<%} }%>
+			</div>
 		</div>
 
 		<div class="form-group" id="comp" style="visibility: visible;">
@@ -117,7 +126,7 @@
 		</div>
 		<div class="form-group">
 			<label>Assignee<span class="alert">*</span></label> <select
-				class="form-control" name="assignee" id="assignee" required>
+				class="form-control" name="assignee" id="assignee" >
 				<option value="0">Select ...</option>
 				<%
 					for (User u : users) {
@@ -127,6 +136,7 @@
 					}
 				%>
 			</select>
+			<span>Leave blank for default</span>
 		</div>
 
 		<div class="form-group">

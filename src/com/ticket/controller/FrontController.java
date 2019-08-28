@@ -891,23 +891,55 @@ public class FrontController extends HttpServlet {
 				ProductModel pm = new ProductModel();
 				Cookie cookie = new Cookie("message", "ticket_added");
 				cookie.setMaxAge(9);
-
+				
+				Product p = null;
+				
+				t.setProducts("0");
+				if(request.getParameter("product") != null) {
+						p = pm.getById(Integer.parseInt(request.getParameter("product")));
+						t.setProductId(Integer.parseInt(request.getParameter("product")));
+						
+				}
+				else {
+					t.setProductId(0);
+					String[] products = request.getParameterValues("products");
+					StringBuilder pids = new StringBuilder("");
+					for(String s:products) {
+						pids.append(s + ",");
+					}
+					pids.setCharAt(pids.length()-1, ' ');
+					System.out.print(pids);
+					
+					
+					t.setProducts(pids.toString());
+				}
+				
+				
 				t.setTicketKey(request.getParameter("project"));
-				t.setAssignee(request.getParameter("assignee"));
 				t.setStatus("open");
 				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setDueDate(request.getParameter("dueDate"));
 				t.setSummary(request.getParameter("summary"));
 				t.setPriority(request.getParameter("priority"));
-				t.setProductId(Integer.parseInt(request.getParameter("product")));
 				t.setReporter(request.getParameter("reporter"));
 				t.setResolution("unresolved");
-				// t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
+				
+				if(request.getParameter("assignee").equals("0")) {
+						t.setAssignee(p.getDefaultAssignee());
+				}
+				else {
+					t.setAssignee(request.getParameter("assignee"));
+				}
+				
 				try {
 					int id = tModel.insert(t);
-					Product p = pm.getById(Integer.parseInt(request.getParameter("product")));
-					tModel.updateKey(id, p.getProductName() + "-" + id);
+					if(p == null) {
+						tModel.updateKey(id, "PDCR" + "-" + id);
+					}else {
+						tModel.updateKey(id, p.getProductName() + "-" + id);
+					}
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1137,21 +1169,55 @@ public class FrontController extends HttpServlet {
 				ProductModel pm = new ProductModel();
 				Cookie cookie = new Cookie("message", "Ticked_added");
 				cookie.setMaxAge(9);
+				
+				Product p = null;
+				
+				t.setProducts("0");
+				if(request.getParameter("product") != null) {
+						p = pm.getById(Integer.parseInt(request.getParameter("product")));
+						t.setProductId(Integer.parseInt(request.getParameter("product")));
+						
+				}
+				else {
+					t.setProductId(0);
+					String[] products = request.getParameterValues("products");
+					StringBuilder pids = new StringBuilder("");
+					for(String s:products) {
+						pids.append(s + ",");
+					}
+					pids.setCharAt(pids.length()-1, ' ');
+					System.out.print(pids);
+					
+					
+					t.setProducts(pids.toString());
+				}
+				
+				
 				t.setTicketKey(request.getParameter("project"));
-				t.setAssignee(request.getParameter("assignee"));
 				t.setStatus("open");
+				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
+				t.setDueDate(request.getParameter("dueDate"));
 				t.setSummary(request.getParameter("summary"));
 				t.setPriority(request.getParameter("priority"));
-				t.setProductId(Integer.parseInt(request.getParameter("product")));
 				t.setReporter(request.getParameter("reporter"));
-				t.setDueDate(request.getParameter("dueDate"));
 				t.setResolution("unresolved");
-				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
+				
+				if(request.getParameter("assignee").equals("0")) {
+					t.setAssignee(p.getDefaultAssignee());
+				}
+				else {
+					t.setAssignee(request.getParameter("assignee"));
+				}
+				
+				
 				try {
 					int id = tModel.insert(t);
-					Product p = pm.getById(Integer.parseInt(request.getParameter("product")));
-					tModel.updateKey(id, p.getProductName() + "-" + id); // for unqiue key
+					if(p == null) {
+						tModel.updateKey(id, "PDCR" + "-" + id);
+					}else {
+						tModel.updateKey(id, p.getProductName() + "-" + id);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1344,7 +1410,6 @@ public class FrontController extends HttpServlet {
 					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 					rd.forward(request, response);
 				} else {
-
 					RequestDispatcher rd = request.getRequestDispatcher(path + "employee/dashboard.jsp");
 					rd.forward(request, response);
 				}
@@ -1598,4 +1663,25 @@ public class FrontController extends HttpServlet {
 
 	}// end process
 
+	
+	
+	/*
+	 * public void readFile()
+	 * {
+	 * try { FileInputStream fin = new FileInputStream(new File(""));
+	 * 
+	 * // workbook instance Workbook wb = null; try { wb =
+	 * WorkbookFactory.create(fin); } catch (EncryptedDocumentException |
+	 * InvalidFormatException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); } Sheet sheet = wb.getSheetAt(0); int noOfRows =
+	 * sheet.getLastRowNum(); System.out.print(noOfRows);
+	 * 
+	 * FormulaEvaluator formulaEvaluator =
+	 * wb.getCreationHelper().createFormulaEvaluator();
+	 * 
+	 * }
+	 */
+	
+	
+	
 }

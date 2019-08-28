@@ -15,10 +15,10 @@ function ticket_validation() {
 		flag = 1
 	}
 
-	if (assignee == 0) {
-		message = "select assignee type";
-		flag = 1
-	}
+//	if (assignee == 0) {
+//		message = "select assignee type";
+//		//flag = 1
+//	}
 
 	if (priority == 0) {
 		message = "select priority type";
@@ -31,7 +31,7 @@ function ticket_validation() {
 	}
 	if (product == 0) {
 		message = "select product type";
-		flag = 1
+		//flag = 1
 	}
 
 	if (departmentname == 0) {
@@ -81,8 +81,22 @@ function compns() {
 	var tc = x.options[x.selectedIndex].innerHTML;
 	if (tc == 'PDCR') {
 		document.getElementById('comp').style.visibility = 'hidden';
+		document.getElementById('product').style.visibility = 'hidden';
+		document.getElementById('product').disabled = true;
+		document.getElementById('pds').style.display = 'block';
+		document.getElementById('assignee').required = true; 
+		document.getElementById('assignee').firstElementChild.remove();
+		
 	} else {
 		document.getElementById('comp').style.visibility = 'visible';
+		document.getElementById('product').style.visibility = 'visible';
+		document.getElementById('product').disabled = false;
+		document.getElementById('pds').style.display = 'none';
+		document.getElementById('assignee').required = false;
+		
+		var select = document.getElementById('assignee');
+		var opt = new Option('Select..', '0');
+		select.insertBefore(opt, select.firstChild);
 	}
 	return false;
 }
