@@ -105,6 +105,9 @@ public class FrontController extends HttpServlet {
 	// filters
 
 	private final static String FILTER_TICKET_TABLE = "filter_ticket_side.htm";
+	
+	// UPLOAD_FILE
+	private final static String UPLOAD_FILE = "upload_file.htm";
 
 	// logout logout.htm
 	private final static String LOGOUT = "logout.htm";
@@ -775,6 +778,7 @@ public class FrontController extends HttpServlet {
 				Cookie cookie = new Cookie("message", "ticketType_updated");
 				cookie.setMaxAge(9);
 
+				
 				int flag = 0;
 				try {
 					flag = (int) ttModel.updateById(t.getTicketTypeId(), t);
@@ -1009,7 +1013,7 @@ public class FrontController extends HttpServlet {
 				Ticket t1 = new Ticket();
 				
 				t.setTicketId(Integer.parseInt(request.getParameter("id")));
-				t.setTicketId(Integer.parseInt(request.getParameter("tickettype")));
+				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setTicketKey(request.getParameter("project"));
 				t.setAssignee(request.getParameter("assignee"));
 				t.setStatus(request.getParameter("status"));
@@ -1019,10 +1023,10 @@ public class FrontController extends HttpServlet {
 				t.setReporter(request.getParameter("reporter"));
 				t.setResolution("unresolved");
 				t.setDueDate(request.getParameter("dueDate"));
-				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
-
-
+				
+				System.out.println(t.getTicketId());
+				System.out.println(t.toString());
 				t1 = tModel.getById(t.getTicketId());
 				try {
 					tModel.updateById(t.getTicketId(), t);
@@ -1248,7 +1252,7 @@ public class FrontController extends HttpServlet {
 				cookie.setMaxAge(9);
 
 				t.setTicketId(Integer.parseInt(request.getParameter("id")));
-				t.setTicketId(Integer.parseInt(request.getParameter("tickettype")));
+				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setTicketKey(request.getParameter("project"));
 				t.setAssignee(request.getParameter("assignee"));
 				t.setStatus(request.getParameter("status"));
@@ -1258,7 +1262,8 @@ public class FrontController extends HttpServlet {
 				t.setReporter(request.getParameter("reporter"));
 				t.setDueDate(request.getParameter("dueDate"));
 				t.setResolution("unresolved");
-				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
+				t.setDueDate(request.getParameter("dueDate"));
+				t.setComponent(Integer.parseInt(request.getParameter("component")));
 
 				t1 = tModel.getById(t.getTicketId());
 				try {
@@ -1391,7 +1396,7 @@ public class FrontController extends HttpServlet {
 
 				UserModel uModel = new UserModel();
 				User u = new User();
-				Cookie cookie = new Cookie("message", "ticket_added");
+				Cookie cookie = new Cookie("message", "employee_added");
 				cookie.setMaxAge(9);
 
 				u.setName(request.getParameter("name"));
@@ -1495,7 +1500,8 @@ public class FrontController extends HttpServlet {
 
 				UserModel uModel = new UserModel();
 				User u = new User();
-
+				Cookie cookie = new Cookie("message", "employee_updated");
+				cookie.setMaxAge(9);
 				u.setUserId(Integer.parseInt(request.getParameter("id")));
 				u.setName(request.getParameter("name"));
 				u.setUserName(request.getParameter("username"));
@@ -1505,7 +1511,7 @@ public class FrontController extends HttpServlet {
 				u.setRole(request.getParameter("role"));
 
 				uModel.updateUser(u);
-
+				response.addCookie(cookie);
 				response.sendRedirect(ADMIN_DASHBOARD);
 			}
 
@@ -1567,6 +1573,25 @@ public class FrontController extends HttpServlet {
 			RequestDispatcher rd = request.getRequestDispatcher(path + "employee/dashboard.jsp");
 			rd.forward(request, response);
 
+		}
+		
+		else if(requestUrl.endsWith(UPLOAD_FILE))
+		{
+			
+			Cookie[] cookies = request.getCookies();
+			String ssid = "";
+			for (Cookie c : cookies) {
+				if (c.getName().equals("sessionId")) {
+					ssid = c.getValue();
+				}
+			}
+			if (ssid.equals("")) {
+				out.println(" Session has Expired  ");
+			} else {
+			request.setAttribute("pageName", "upload");
+			RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
+			rd.forward(request, response);
+			}
 		}
 
 	}// end process

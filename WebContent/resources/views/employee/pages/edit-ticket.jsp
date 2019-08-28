@@ -21,9 +21,9 @@
 		<h1>Edit Ticket</h1>
 		<div class="form-group">
 			<label>ticket key <span class="alert">*</span></label> <input
-				type="text" class="form-control" required name="project"
-				value="<%=ticket.getTicketKey()%>" id="project"
-				placeholder="Enter ticket key">
+				type="text" class="form-control"   name="project"
+				value="<%=ticket.getTicketKey() %>" id="project"
+				placeholder="Enter ticket key" disabled>
 		</div>
 
 		<div class="form-group">
@@ -31,11 +31,13 @@
 				class="form-control" name="tickettype" required>
 				<option value="0">Select ...</option>
 				<%
-					for (Department d : departments) {
+					for (TicketType d : tickettypes) {
 				%>
-				<option value="<%=d.getDepartmentId()%>"
-					<%if (ticket.getTicketTypeId() == d.getDepartmentId())
-					out.println("selected");%>><%=d.getDepartmentName()%></option>
+				<option value="<%=d.getTicketTypeId()%>"
+					<%if (ticket.getTicketTypeId() == d.getTicketTypeId())
+						out.println("selected");%>>
+						<%=d.getTicketName()%>
+				</option>
 				<%
 					}
 				%>

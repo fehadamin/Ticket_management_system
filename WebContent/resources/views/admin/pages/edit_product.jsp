@@ -27,7 +27,7 @@
 			<label> assignee </label>
 				<select
 				class="form-control" name="defaultassignee" required>
-				<option value="0">Select ... </option>
+				<!-- <option value="0">Select ... </option> -->
 				<% for(User u:users){ %>
 					<option value="<%=u.getName()%>"><%=u.getName()%></option>
 				<%} %>

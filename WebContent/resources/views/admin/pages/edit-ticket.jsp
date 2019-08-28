@@ -6,7 +6,7 @@
     	String viewpath=ctx.getInitParameter("viewpath");
 
     	
- List<Department> departments = (ArrayList)request.getAttribute("departments");    	
+     	
  List<Product> products = (ArrayList) request.getAttribute("products");
  List<TicketType> tickettypes = (ArrayList) request.getAttribute("tickettypes");
 
@@ -34,11 +34,17 @@
 		<label>Ticket Type <span class="alert">*</span></label> 
 		<select class="form-control" name="tickettype"required>
 			<option value="0">Select ...</option>
-			<% for(Department d:departments){ %>
-			<option value="<%=d.getDepartmentId()%>" 
-				<% if(ticket.getTicketTypeId() == d.getDepartmentId())out.println("selected"); %>
-			><%=d.getDepartmentName()%></option>
-			<%} %>
+				<%
+					for (TicketType d : tickettypes) {
+				%>
+				<option value="<%=d.getTicketTypeId()%>"
+					<%if (ticket.getTicketTypeId() == d.getTicketTypeId())
+						out.println("selected");%>>
+						<%=d.getTicketName()%>
+				</option>
+				<%
+					}
+				%>
 		</select>
 		</div>
 				<div class="form-group">
@@ -117,7 +123,9 @@
 				<%
 					for (User u : users) {
 				%>
-				<option value="<%=u.getName()%>"><%=u.getName()%></option>
+				<option value="<%=u.getName()%>"
+					<% if(u.getName().equals(ticket.getReporter())) out.println("selected");%>
+				><%=u.getName()%></option>
 				<%
 					}
 				%>
