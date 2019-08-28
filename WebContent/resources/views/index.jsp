@@ -19,8 +19,8 @@
 	Home page
 	
 	this is index
-	<a href="<%=Url%>login.htm"> LOGIN LINK</a>
+	<a href="${Url}login.htm"> LOGIN LINK</a>
 </body>
 </html>
 
-<script src="<%=Url%>resources/js/main.js"></script>
+<script src="${Url}resources/js/main.js"></script>

@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1" import="com.ticket.entity.*,java.util.*"%>
 <%
@@ -19,26 +20,30 @@
 	<div class="box">
 
 		<h1>Edit Ticket</h1>
-		<div class="form-group">
+		<%-- <div class="form-group">
 			<label>ticket key <span class="alert">*</span></label> <input
 				type="text" class="form-control" required name="project"
-				value="<%=ticket.getTicketKey()%>" id="project"
+				<c:out value="${ticket.getTicketKey()}"/> id="project"
 				placeholder="Enter ticket key">
-		</div>
+		</div> --%>
 
 		<div class="form-group">
 			<label>Ticket Type <span class="alert">*</span></label> <select
 				class="form-control" name="tickettype" required>
 				<option value="0">Select ...</option>
-				<%
-					for (Department d : departments) {
-				%>
-				<option value="<%=d.getDepartmentId()%>"
-					<%if (ticket.getTicketTypeId() == d.getDepartmentId())
-					out.println("selected");%>><%=d.getDepartmentName()%></option>
-				<%
-					}
-				%>
+
+				<c:forEach var="d" items="${departments}">
+
+					<option value="<c:out value="${d.getDepartmentId()}"/>"
+						<c:if  test= "${ ticket.getTicketKey()} == ${d.getDepartmentId()}">
+					
+								<c:out value="selected" />
+							</c:if>>
+						<c:out value="${d.getDepartmentName()}" />
+					</option>
+				</c:forEach>
+
+
 			</select>
 		</div>
 
@@ -46,15 +51,14 @@
 			<label>Product <span class="alert">*</span></label> <select
 				name="product" class="form-control" required>
 				<option value="0">Select ...</option>
-				<%
-					for (Product d : products) {
-				%>
-				<option value="<%=d.getProductId()%>"
-					<%if (ticket.getProductId() == d.getProductId())
-					out.println("selected");%>><%=d.getProductName()%></option>
-				<%
-					}
-				%>
+
+				<c:forEach var="d" items="${products}">
+					<option <c:out value="${d.getProductId()}"/>
+						<c:if test = "${ticket.getProductId()} == ${d.getProductId()}" >
+										<c:out value="selected" />  </c:if>>
+						<c:out value="${d.getProductName()}" />
+					</option>
+				</c:forEach>
 			</select>
 		</div>
 
@@ -63,45 +67,66 @@
 			<label>Component <span class="alert">*</span></label> <select
 				name="component" class="form-control" required>
 				<option value="0">Select ...</option>
-				<%
-					for (Product d : products) {
-						if (d.getParent() != 0) {
-				%>
-				<option value="<%=d.getProductId()%>"
-					<%if (ticket.getComponent() == d.getProductId())
-						out.println("selected");%>><%=d.getProductName()%></option>
-				<%
-					}
-					}
-				%>
-			</select>
+				<c:forEach var="d" items="${products}">
+					<c:if
+						test="${d.getParent() != 0 }" >
+				 
+						<option <c:out value="${d.getProductId()}"/>
+							<c:if test = "${ticket.getComponent()} == ${d.getProductId()}" >
+											<c:out value="selected" />  </c:if>>
+							<c:out value="${d.getProductName()}" />
+						</option>
+					</c:if>
+				</c:forEach>
+				
+			
+			</select> 
 		</div>
 
 
 		<div class="form-group">
 			<label>Summary <span class="alert">*</span></label>
 			<textarea style="width: 100%; height: 40px;" class="form-control"
-				name="summary"><%=ticket.getSummary()%></textarea>
+				name="summary">${ticket.getSummary()}</textarea>
 		</div>
 
 		<div class="form-group">
 			<label>Due date *</label> <input type="text" class="form-control"
-				name="dueDate" id="dueDate" value="<%=ticket.getDueDate()%>"
+				name="dueDate" id="dueDate" value="${ticket.getDueDate()}"
 				required />
 		</div>
 
 		<div class="form-group">
 			<label>priority <span class="alert">*</span></label> <select
 				class="form-control" name="priority" required>
+
+
+
+
+
 				<option value="Blocker"
-					<%if (ticket.getPriority().equals("Blocker"))
-				out.println("selected");%>>Blocker</option>
+					<c:if test="${ticket.getPriority() == 'Blocker'}">
+							<c:out value="selected" /> Blocker
+				</c:if>>Blocker
+				</option>
+
 				<option value="Critical"
-					<%if (ticket.getPriority().equals("Critical"))
-				out.println("selected");%>>Critical</option>
-				<option value="Major"
-					<%if (ticket.getPriority().equals("Major"))
-				out.println("selected");%>>Major</option>
+					<c:if test="${ticket.getPriority() == 'Critical'}">
+							<c:out value="selected" /> Critical
+				</c:if>>Critical
+				</option>
+				
+			
+					<option value="Major"
+					<c:if test="${ticket.getPriority() == 'Major'}">
+							<c:out value="selected" /> Major
+				</c:if>   >Major
+				</option>
+					
+				
+				
+				
+				
 			</select>
 		</div>
 
@@ -110,39 +135,67 @@
 			<label>Assignee<span class="alert">*</span></label> <select
 				class="form-control" name="assignee" required>
 				<option value="0">Select ...</option>
-				<%
-					for (User u : users) {
-				%>
-				<option value="<%=u.getName()%>"
-					<%if (ticket.getAssignee().equals(u.getName()))
-					out.println("selected");%>><%=u.getName()%></option>
-				<%
-					}
-				%>
+				
+				<c:forEach var="u" items="${users}">
+				
+					<option value="<c:out value="${u.getName()}"/>"
+							<c:if test = "${ticket.getAssignee()} == ${u.getName()}" >
+											<c:out value="selected" />  </c:if> >
+							<c:out value="${u.getName()}" />
+						</option>
+				
+				</c:forEach>
+				
 			</select>
 		</div>
-
+ 
 		<div class="form-group">
 			<label>Reporter<span class="alert">*</span></label> <select
 				class="form-control" name="reporter" required>
 				<option value="0">Select ...</option>
 
-				<%
-					for (User u : users) {
-				%>
-				<option value="<%=u.getUserId()%>"
-					<%if (ticket.getReporter().equals("" + u.getUserId()))
-					out.println("selected");%>><%=u.getName()%></option>
-				<%
-					}
-				%>
+				<c:forEach var="u" items="${users}">
+				
+					<option value="<c:out value="${u.getName()}"/>"
+							<c:if test = "${ticket.getReporter()} == ${u.getName()}" >
+											<c:out value="selected" />  </c:if> >
+							<c:out value="${u.getName()}" />
+						</option>
+				
+				</c:forEach>
 
 
 			</select>
-		</div>
+			<c:out value="${ticket.getReporter()} " />
+		</div> 
+		
+		
+		
+		
 		<div class="form-group">
 			<label>status <span class="alert">*</span></label> <select
 				class="form-control" name="status" required>
+				
+				
+				<option value="open"
+					<c:if test="${ticket.getStatus() == 'Blocker'}">
+							<c:out value="selected" /> Blocker
+				</c:if>>Open
+				</option>
+			
+				<option value="In Progress"
+					<c:if test="${ticket.getStatus() == 'In Progress'}">
+							<c:out value="selected" /> In Progress
+				</c:if>> In Progress
+				</option>
+				
+				
+				<option value="Resolved"
+					<c:if test="${ticket.getStatus() == 'Resolved'}">
+							<c:out value="selected" /> Resolved
+				</c:if>>Resolved
+				</option>
+				<%-- 
 				<option value="Open"
 					<%if (ticket.getStatus().equals("Blocker"))
 				out.println("selected");%>>Open</option>
@@ -152,7 +205,7 @@
 					Progress</option>
 				<option value="Resolved"
 					<%if (ticket.getStatus().equals("Resolved"))
-				out.println("selected");%>>Resolved</option>
+				out.println("selected");%>>Resolved</option> --%>
 			</select>
 		</div>
 
