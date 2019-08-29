@@ -125,4 +125,23 @@ public class ProductModel implements ProductDao,SqlQueries {
 		return flag;
 	}
 
+	public Product getByName(String name) {
+		Product p=new Product();
+		try {
+			prep=conn.prepareStatement("SELECT * FROM products WHERE product_name = ?");
+			prep.setString(1, name);
+			result=prep.executeQuery();
+			while(result.next())
+			{
+				p.setProductId(result.getInt("product_id"));
+				p.setProductName(result.getString("product_name"));
+				p.setDefaultAssignee(result.getString("default_assignee"));
+				p.setParent(result.getInt("parent"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return p;
+	}
 }

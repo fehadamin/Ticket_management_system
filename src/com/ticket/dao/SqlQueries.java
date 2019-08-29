@@ -20,7 +20,7 @@ public interface SqlQueries {
 		 // ticket queries
 		  final static String GET_ALL_TICKETS = "SELECT * from tickets";
 			 final static String UPDATE_TICKET = "UPDATE tickets SET ticket_key=?	,ticket_type_id=?	,product_id=?	,summary=?	,assignee=?	,reporter=?,	priority=?	,status=?,	resolution=?, due_date = ?,	created=?	,updated=? ,component=?  where ticket_id=?";
-			 final static String INSERT_TICKET = "INSERT into tickets (ticket_id,ticket_key,ticket_type_id,product_id,summary,assignee,reporter,priority,status,resolution,due_date,created,updated,component,products)	values(null,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			 final static String INSERT_TICKET = "INSERT into tickets (ticket_id,ticket_key,ticket_type_id,product_id,summary,assignee,reporter,priority,status,resolution,due_date,component,products)	values(null,?,?,?,?,?,?,?,?,?,?,?,?)";
 			 final static String GET_BY_RESOLUTION = "SELECT * from tickets where 	resolution=?";
 			 final static String GET_TICKET_BY_ID = "SELECT * from tickets where ticket_id =? ";
 			 final static String GET_BY_STATUS = "SELECT * from tickets where status=?";

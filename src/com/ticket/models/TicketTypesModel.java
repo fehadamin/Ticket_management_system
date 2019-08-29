@@ -115,5 +115,22 @@ public class TicketTypesModel implements TicketTypesDao,SqlQueries {
 		return t;
 	}
 
-
+	public TicketType getByName(String name) {
+		TicketType p=new TicketType();
+		try {
+			prep=conn.prepareStatement("SELECT * FROM ticket_types WHERE ticket_name = ?");
+			prep.setString(1, name);
+			result=prep.executeQuery();
+			while(result.next())
+			{
+				p.setTicketTypeId(result.getInt("ticket_type_id"));
+				p.setTicketName(result.getString("ticket_name"));
+				
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return p;
+	}
 }

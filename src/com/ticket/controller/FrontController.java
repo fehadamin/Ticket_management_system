@@ -1,8 +1,15 @@
 package com.ticket.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -13,6 +20,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.ticket.entity.Department;
 import com.ticket.entity.Product;
@@ -27,6 +39,13 @@ import com.ticket.models.ProductModel;
 import com.ticket.models.TicketModel;
 import com.ticket.models.TicketTypesModel;
 import com.ticket.models.UserModel;
+import com.ticket.virtual.Excel;
+
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+import jxl.write.WritableWorkbook;
 
 /**
  * Servlet implementation class FrontController
@@ -101,6 +120,7 @@ public class FrontController extends HttpServlet {
 	private final static String EMPLOYEE_TICKET_UPDATE_REPORTER = ".htm";
 	private final static String EMPLOYEE_TICKET_UPDATE_ASSIGNEE = ".htm";
 	private final static String EMPLOYEE_TICKET_UPDATE_RESOLUTION = ".htm";
+	
 
 	// filters
 
@@ -108,6 +128,7 @@ public class FrontController extends HttpServlet {
 	
 	// UPLOAD_FILE
 	private final static String UPLOAD_FILE = "upload_file.htm";
+	private final static String FILE_UPLOAD_EXCEL = "upload_file_store.htm";
 
 	// logout logout.htm
 	private final static String LOGOUT = "logout.htm";
@@ -128,7 +149,12 @@ public class FrontController extends HttpServlet {
 			throws ServletException, IOException {
 
 		try {
-			process(request, response);
+			try {
+				process(request, response);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (UserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -143,7 +169,12 @@ public class FrontController extends HttpServlet {
 			throws ServletException, IOException {
 
 		try {
-			process(request, response);
+			try {
+				process(request, response);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (UserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -151,7 +182,7 @@ public class FrontController extends HttpServlet {
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, UserException {
+			throws ServletException, IOException, UserException, ParseException {
 		// TODO Auto-generated method stub
 
 		String requestUrl = request.getRequestURI();
@@ -1655,33 +1686,194 @@ public class FrontController extends HttpServlet {
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
-			request.setAttribute("pageName", "upload");
+				request.setAttribute("pageName", "upload");
+				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
+				rd.forward(request, response);
+			}
+		}else if(requestUrl.endsWith(FILE_UPLOAD_EXCEL)) {
+			
+			String filename = upload(request,response);
+			System.out.println(filename);
+			List<Object> list = readExcel(filename);
+			
+			
+			System.out.print(list.toString());
+			
+			request.setAttribute("filename", filename);
+			request.setAttribute("report", list);
+			request.setAttribute("pageName", "upload-show");
 			RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 			rd.forward(request, response);
+			
+		}
+		else if(requestUrl.endsWith("upload-db.htm")) {
+			
+			String filename = request.getParameter("filename");
+			System.out.println(filename);
+			List<Object> list = readExcel(filename);
+			
+			
+			// Converting sheet data
+			TicketTypesModel ttm = new TicketTypesModel();
+			ProductModel pm = new ProductModel();
+			
+			List<Ticket> tickets = new ArrayList<Ticket>(); 
+			
+			for(Object o:list) {
+				List<String> data = (ArrayList)o;   //columns
+				int max = data.size();
+				Ticket t = new Ticket();
+				
+				TicketType tt = ttm.getByName(data.get(0));
+					
+				
+				t.setTicketTypeId(tt.getTicketTypeId());
+				t.setTicketKey(data.get(1));
+				t.setSummary(data.get(2));
+				t.setAssignee(data.get(3));
+				t.setReporter(data.get(4));
+				t.setPriority(data.get(5));
+				t.setStatus(data.get(6));
+				t.setResolution(data.get(7));
+				t.setCreated(data.get(8));
+				t.setUpdated(data.get(9));
+				
+				String[] str = data.get(1).split("-",-2);
+				if(!str[0].equals("PDCR")) {
+					Product p = pm.getByName(str[0]);
+					t.setProductId(p.getProductId());
+					t.setComponent(0);
+					t.setProducts("0");
+				}
+				else {
+					
+					t.setProducts("0");
+				}
+				
+				
+				//SimpleDateFormat format = new SimpleDateFormat("dd-M-yy");
+				
+				java.util.Date today= new java.util.Date();
+				t.setDueDate(new SimpleDateFormat("dd-M-yy").format(today));
+				
+				tickets.add(t);
+				
 			}
+			
+			// storing to database
+			TicketModel ticketModel = new TicketModel();
+			for(Ticket t :tickets) {
+				int flag = ticketModel.isAlreadyExist(t);
+				if(flag == 1) {
+					try {
+						ticketModel.insert(t);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+//				System.out.println(t.toString());	
+			}
+			
+			System.out.println("Successful ");
+			response.sendRedirect(ADMIN_DASHBOARD);
 		}
 
 	}// end process
 
 	
 	
-	/*
-	 * public void readFile()
-	 * {
-	 * try { FileInputStream fin = new FileInputStream(new File(""));
-	 * 
-	 * // workbook instance Workbook wb = null; try { wb =
-	 * WorkbookFactory.create(fin); } catch (EncryptedDocumentException |
-	 * InvalidFormatException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } Sheet sheet = wb.getSheetAt(0); int noOfRows =
-	 * sheet.getLastRowNum(); System.out.print(noOfRows);
-	 * 
-	 * FormulaEvaluator formulaEvaluator =
-	 * wb.getCreationHelper().createFormulaEvaluator();
-	 * 
-	 * }
-	 */
 	
+	private String upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		ServletContext servletContext = request.getServletContext();
+		String path = servletContext.getRealPath("/");
+		String file_name = null;
+		String tempName = "";
+		
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		boolean isMultipartContent = ServletFileUpload.isMultipartContent(request);
+		if (!isMultipartContent) {
+			return "";
+		}
+		FileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		try {
+			List<FileItem> fields = upload.parseRequest(request);
+			Iterator<FileItem> it = fields.iterator();
+			if (!it.hasNext()) {
+				return "";
+			}
+			while (it.hasNext()) {
+				FileItem fileItem = it.next();
+				boolean isFormField = fileItem.isFormField();
+				if (isFormField) {
+					if (file_name == null) {
+						if (fileItem.getFieldName().equals("file_name")) {
+							file_name = fileItem.getString();
+						}
+					}
+				} else {
+					if (fileItem.getSize() > 0) {
+						tempName = fileItem.getName();
+						System.out.println(path);
+						fileItem.write(new File("C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"+ fileItem.getName()));
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			//response.sendRedirect("admin-upload-data.htm?file="+file_name+"&tmp="+tempName);
+		}
+		
+		return tempName;
+	}// end upload
 	
+	public List<Object> readExcel(String filename){
+		
+		Workbook workbook = null;
+		List<Object> report = new ArrayList<Object>();
+		try {
+			FileInputStream file = new FileInputStream(new File(
+					"C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"+filename));
+			try {
+				workbook = Workbook.getWorkbook(file);
+				Sheet sheet = workbook.getSheet(0);
+				int rows = sheet.getRows();
+				int col = sheet.getColumns();
+				
+				System.out.println(rows+"|"+col);
+				
+				for(int i=0;i<rows;i++) {
+					
+					List<String> columns = new ArrayList<String>();
+					for(int j=0;j<col;j++) {
+						
+						
+						Cell cell1 = sheet.getCell(j, i);
+						System.out.print(cell1.getContents() + "\t");
+						columns.add(cell1.getContents());
+					}
+					System.out.print("\n");
+					report.add(columns);
+				}
+				
+			} catch (BiffException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return report;
+		//return null;
+		
+	}
 	
 }

@@ -8,20 +8,20 @@
 </head>
 <body>
 
-	<form action="upload_file.htm" method="post">
+	<form action="upload_file_store.htm" method="post" enctype="multipart/form-data">
 		<div class="box">
 			<h1>UPLOAD</h1>
-			<div class="form-group">
+			<div class="form-group" style="display:none;">
 				<label> File Name: <span class="alert"></span></label> <input
-					type="text" class="form-control" name="filename"
+					type="text" class="form-control" value="abc" name="filename"
 					placeholder="Enter file key">
 			</div>
-
-
+  
 			<div class="form-group">
 				<label> File Name: <span class="alert"></span></label> <input
 					type="file" class="form-control" name="upload">
 			</div>
+			<button type="submit">submit</button>
 			</div>
 	</form>
 

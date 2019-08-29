@@ -1,0 +1,41 @@
+$(function() {
+
+	$("form[name='bookvehicle']").validate({
+	    // Specify validation rules
+		
+	    rules: {
+	      // The key name on the left side is the name attribute
+	      // of an input field. Validation rules are defined
+	      // on the right side
+	    	customername: "required",
+	    	vehiclecategory: "required",
+	    	bookedfrom: "required",
+	    	bookedto: "required",
+	    	totalrent: "required",
+	    	payment: "required"
+	    },
+	    // Specify validation error messages
+	    messages: {
+	    	customername: "Please enter vaild customername",
+	    	vehiclecategory: "Please enter vaild vehiclecategory",
+	    	bookedfrom: "Please enter vaild bookedfrom",
+	    	bookedto: "Please enter vaild  bookedto",
+	    	totalrent: "Please enter vaild totalrent",
+	    	payment: "Please enter vaild payment",
+	    },
+	    // Make sure the form is submitted to the destination defined
+	    // in the "action" attribute of the form when valid
+	    submitHandler: function(form) {
+	      form.submit();
+	    }
+	  });
+	
+	
+	
+	
+	
+	
+	
+	
+	
+});

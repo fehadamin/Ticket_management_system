@@ -204,10 +204,10 @@ public class TicketModel implements TicketDao,SqlQueries{
 			Date due = format.parse(t.getDueDate());
 			java.sql.Date sDue = new java.sql.Date(due.getTime());
 			prep.setDate(10,sDue);
-			prep.setString(11, t.getCreated());
-			prep.setString(12, t.getUpdated());
-			prep.setInt(13, t.getComponent());
-			prep.setString(14, t.getProducts());
+			//prep.setString(11, t.getCreated());
+			//prep.setString(12, t.getUpdated());
+			prep.setInt(11, t.getComponent());
+			prep.setString(12, t.getProducts());
 			flag = prep.executeUpdate();
 			
 			result = prep.getGeneratedKeys();
@@ -543,7 +543,29 @@ public class TicketModel implements TicketDao,SqlQueries{
 		return ticket;
 	}
 
-
+	public int isAlreadyExist(Ticket t) {
+		int flag= 0;
+		try {
+			prep = conn.prepareStatement("SELECT * FROM tickets WHERE ticket_key = ? AND ticket_type_id = ? AND product_id =? AND assignee =?");
+			prep.setString(1, t.getTicketKey());
+			prep.setInt(2, t.getTicketTypeId());
+			prep.setInt(3, t.getProductId());
+			prep.setString(4, t.getAssignee());
+			result = prep.executeQuery();
+			//System.out.println(prep.toString());
+			if (result.next() == false) {
+				flag = 1;// empty
+				System.out.println("rs is  empty");
+			}else {
+				System.out.println("rs availible");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return flag;
+		
+	}
 
 	
 }
