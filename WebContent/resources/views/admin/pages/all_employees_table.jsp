@@ -11,8 +11,8 @@
 
     <div class="res-tab">
         <h1>  all  ticket table</h1>
-        <button id="downloadReport">Download</button>
-        <table class="myTable" id="mytable">
+       <!--  <button id="downloadReport">Download</button>  id="mytable" -->
+        <table class="myTable" >
             <thead>
                     <th> name</th>
                     <th> username</th>

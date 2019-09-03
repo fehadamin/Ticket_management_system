@@ -22,9 +22,9 @@
             <h1>login here</h1>
             <form action="auth.htm" method="post">
                 <p> Email</p>
-                <input type="text"  autocomplete="off" name="email" placeholder="Enter The Email id">
+                <input type="text"  autocomplete="off" name="email"  placeholder="Enter The Email id">
                 <p>Password</p>
-                <input type="password"  autocomplete="off" name="password" placeholder="Enter password">
+                <input type="password"  autocomplete="new-password" name="password" placeholder="Enter password">
                 <input type="submit" name="submit" value="Login"> 
             </form>
             <p>

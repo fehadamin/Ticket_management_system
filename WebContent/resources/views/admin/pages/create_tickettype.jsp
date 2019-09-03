@@ -12,7 +12,7 @@
         
             <h1> create ticket types</h1>
             <div class="form-group">
-            <label> name<span class="alert">*</span> </label>
+            <label> name *<span class="alert">*</span> </label>
             <input type="text" required class="form-control" name="tickettypename" id="tickettypename" placeholder="Enter ticket type name"> 
             	<div id="eresult" style="color: firebrick; display: block;"></div>
             </div>

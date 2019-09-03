@@ -15,7 +15,7 @@
 
 		<h1>create Product</h1>
 		<div class="form-group">
-			<label> Product name<span class="alert">*</span></label> <input
+			<label> Product name*<span class="alert">*</span></label> <input
 				type="text" class="form-control" name="productname" required
 				id="productname" placeholder="Enter product name">
 

@@ -10,8 +10,9 @@ public interface DepartmentDao {
 	 *  get department by using primarykey  departmentId
 	 * @param departmentId
 	 * @return
+	 * @throws DepartmentException 
 	 */
-	public Department getById(int departmentId);
+	public Department getById(int departmentId) throws DepartmentException;
 	/**
 	 * updating the table 
 	 * @param departmentId
@@ -23,14 +24,16 @@ public interface DepartmentDao {
 	/**
 	 * get  list of departments present
 	 * @return
+	 * @throws DepartmentException 
 	 */
-	public List<Department> getAll();
+	public List<Department> getAll() throws DepartmentException;
 	/**
 	 *  remove the department
 	 * @param departmentId
 	 * @return
+	 * @throws DepartmentException 
 	 */
-	public int remove(int departmentId);
+	public int remove(int departmentId) throws DepartmentException;
 	/**
 	 * inserting a row into the department table
 	 * @param d

@@ -58,7 +58,8 @@
 			<th>Reporter</th>
 			<th>status</th>
 			<th>Resolution</th>
-
+			<th>created</th>
+			<th>updated</th>
 			<th>Action</th>
 
 
@@ -98,7 +99,8 @@
 				<td><%=t.getReporter()%></td>
 				<td><%=t.getStatus()%></td>
 				<td><%=t.getResolution()%></td>
-
+				<td><%=t.getCreated()%> </td>
+				<td><%=t.getUpdated() %></td>
 				<td><a
 					href="<%=Url%>admin-ticket-edit-form.htm?id=<%=t.getTicketId()%>">edit</a>
 					<a href="<%=Url%>admin-ticket-remove.htm?id=<%=t.getTicketId()%>">delete</a>

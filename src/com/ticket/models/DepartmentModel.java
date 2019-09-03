@@ -13,7 +13,7 @@ import com.ticket.dao.SqlQueries;
 import com.ticket.entity.Department;
 import com.ticket.exceptions.DepartmentException;
 
-public class DepartmentModel implements DepartmentDao,SqlQueries {
+public class DepartmentModel implements DepartmentDao, SqlQueries {
 
 	private Connection conn;
 	private PreparedStatement prep;
@@ -25,7 +25,7 @@ public class DepartmentModel implements DepartmentDao,SqlQueries {
 	}
 
 	@Override
-	public Department getById(int departmentId) {
+	public Department getById(int departmentId) throws DepartmentException {
 		// TODO Auto-generated method stub
 		Department d = new Department();
 		try {
@@ -38,7 +38,8 @@ public class DepartmentModel implements DepartmentDao,SqlQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			throw new DepartmentException("get by id exception");
 		}
 		return d;
 	}
@@ -61,7 +62,7 @@ public class DepartmentModel implements DepartmentDao,SqlQueries {
 	}
 
 	@Override
-	public List<Department> getAll() {
+	public List<Department> getAll() throws DepartmentException {
 		// TODO Auto-generated method stub
 
 		List<Department> department = new ArrayList<>();
@@ -77,7 +78,8 @@ public class DepartmentModel implements DepartmentDao,SqlQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DepartmentException("getall exception");
+			//e.printStackTrace();
 		}
 
 		return department;
@@ -102,7 +104,7 @@ public class DepartmentModel implements DepartmentDao,SqlQueries {
 	// select * friom table where dname=?
 
 	@Override
-	public int remove(int departmentId) {
+	public int remove(int departmentId) throws DepartmentException {
 		// TODO Auto-generated method stub
 		int flag = 0;
 		try {
@@ -111,7 +113,8 @@ public class DepartmentModel implements DepartmentDao,SqlQueries {
 			flag = prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DepartmentException("remove exception");
+			//e.printStackTrace();
 		}
 
 		return flag;

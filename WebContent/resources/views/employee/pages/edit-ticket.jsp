@@ -21,8 +21,8 @@
 		<h1>Edit Ticket</h1>
 		<div class="form-group">
 			<label>ticket key <span class="alert">*</span></label> <input
-				type="text" class="form-control"   name="project"
-				value="<%=ticket.getTicketKey() %>" id="project"
+				type="text" class="form-control" name="project"
+				value="<%=ticket.getTicketKey()%>" id="project"
 				placeholder="Enter ticket key" disabled>
 		</div>
 
@@ -35,8 +35,8 @@
 				%>
 				<option value="<%=d.getTicketTypeId()%>"
 					<%if (ticket.getTicketTypeId() == d.getTicketTypeId())
-						out.println("selected");%>>
-						<%=d.getTicketName()%>
+					out.println("selected");%>>
+					<%=d.getTicketName()%>
 				</option>
 				<%
 					}
@@ -115,9 +115,9 @@
 				<%
 					for (User u : users) {
 				%>
-				<option value="<%=u.getName()%>"
-					<%if (ticket.getAssignee().equals(u.getName()))
-					out.println("selected");%>><%=u.getName()%></option>
+				<option value="<%=u.getName()%>" <%if (ticket.getAssignee().equals(u.getName()))out.println("selected");%>>
+					<%=u.getName()%>
+				</option>
 				<%
 					}
 				%>
@@ -132,8 +132,8 @@
 				<%
 					for (User u : users) {
 				%>
-				<option value="<%=u.getUserId()%>"
-					<%if (ticket.getReporter().equals("" + u.getUserId()))
+				<option value="<%=u.getName()%>"
+					<%if (ticket.getReporter().equals(u.getName()) )
 					out.println("selected");%>><%=u.getName()%></option>
 				<%
 					}

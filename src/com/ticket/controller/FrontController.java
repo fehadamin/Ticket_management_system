@@ -33,13 +33,15 @@ import com.ticket.entity.TicketType;
 import com.ticket.entity.User;
 import com.ticket.exceptions.DepartmentException;
 import com.ticket.exceptions.ProductException;
+import com.ticket.exceptions.TicketException;
+import com.ticket.exceptions.TicketTypeException;
 import com.ticket.exceptions.UserException;
 import com.ticket.models.DepartmentModel;
 import com.ticket.models.ProductModel;
 import com.ticket.models.TicketModel;
 import com.ticket.models.TicketTypesModel;
 import com.ticket.models.UserModel;
-import com.ticket.virtual.Excel;
+
 
 import jxl.Cell;
 import jxl.Sheet;
@@ -57,7 +59,7 @@ public class FrontController extends HttpServlet {
 	private final static String HOME = "home.htm";
 	private final static String LOGIN = "login.htm";
 	private final static String AUTH = "auth.htm";
-
+	private final static String L = "/";
 	private final static String ADMIN_DASHBOARD = "admin-dashboard.htm";
 	// department
 	private final static String ADMIN_DEPARTMENT_FORM = "admin-department-form.htm";
@@ -158,6 +160,7 @@ public class FrontController extends HttpServlet {
 		} catch (UserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		}
 	}
 
@@ -196,6 +199,8 @@ public class FrontController extends HttpServlet {
 
 		if (requestUrl.endsWith("/")) {
 			response.sendRedirect(HOME);
+			RequestDispatcher rd = request.getRequestDispatcher(path + "index.jsp");
+			rd.forward(request, response);
 		} else if (requestUrl.endsWith(HOME)) {
 			RequestDispatcher rd = request.getRequestDispatcher(path + "index.jsp");
 			rd.forward(request, response);
@@ -218,7 +223,7 @@ public class FrontController extends HttpServlet {
 			try {
 				u = userModel.authenicateUser(request.getParameter("email"), request.getParameter("password"));
 			} catch (UserException e) {
-				request.setAttribute("message", "incorrect email / password");
+				request.setAttribute("message", "incorrect email/password");
 			}
 			if (u != null) {
 				session.setAttribute("userId", u.getUserId());
@@ -256,15 +261,12 @@ public class FrontController extends HttpServlet {
 		}
 		// department form
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_FORM)) {
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
+				
 			} else {
 
 				request.setAttribute("pageName", "create_department");
@@ -280,15 +282,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -302,18 +299,19 @@ public class FrontController extends HttpServlet {
 				try {
 					dModel.insert(d);
 				} catch (Exception e) {
-					request.setAttribute("message", "department already exist");
+					
+					cookie.setValue("department_already_exist");
 					flag = 1;
 				}
-				if (flag == 0) {
+//				if (flag == 0) {
 					response.addCookie(cookie);
-					response.sendRedirect(ADMIN_DASHBOARD);
-				} else {
-					request.setAttribute("pageName", "home");
-
-					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
-					rd.forward(request, response);
-				}
+					response.sendRedirect(ADMIN_DEPARTMENT_ALL);
+//				} else {
+//					request.setAttribute("pageName", "home");
+//
+//					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
+//					rd.forward(request, response);
+//				}
 
 			}
 		}
@@ -323,15 +321,11 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_ALL)) {
 			// checking
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -355,22 +349,28 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_EDIT_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
 
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
 				DepartmentModel dModel = new DepartmentModel();
-				Department d = dModel.getById(Integer.parseInt(request.getParameter("id")));
+				Department d = null;
+				try {
+					d = dModel.getById(Integer.parseInt(request.getParameter("id")));
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DepartmentException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception");
+					//e.printStackTrace();
+				}
 				request.setAttribute("department", d);
 				request.setAttribute("pageName", "edit_department");
-
+				response.addCookie(cookie);
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 				rd.forward(request, response);
 			}
@@ -381,15 +381,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_EDIT_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				DepartmentModel dModel = new DepartmentModel();
 				Department d = new Department();
@@ -402,13 +397,13 @@ public class FrontController extends HttpServlet {
 				try {
 					flag = (int) dModel.updateById(d.getDepartmentId(), d);
 				} catch (DepartmentException e) {
-					cookie.setValue("Some_error_occured");
+					cookie.setValue("name_exists_try_a_new_name");
 					// e.printStackTrace();
 				}
 
 				response.addCookie(cookie);
 
-				response.sendRedirect(ADMIN_DASHBOARD);
+				response.sendRedirect(ADMIN_DEPARTMENT_ALL);
 
 			}
 		}
@@ -417,13 +412,7 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_REMOVE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -442,7 +431,7 @@ public class FrontController extends HttpServlet {
 				if (flag == 1) {
 					response.addCookie(cookie);
 					request.setAttribute("message", "Department removed successfully ");
-					response.sendRedirect(ADMIN_DASHBOARD);
+					response.sendRedirect(ADMIN_DEPARTMENT_ALL);
 				}
 
 			}
@@ -452,21 +441,24 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_PRODUCT_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
+				Cookie cookie = new Cookie("message", "product_added");
+				cookie.setMaxAge(9);
 
 				UserModel u = new UserModel();
 				request.setAttribute("users", u.getAll());
 				ProductModel pm = new ProductModel();
-				request.setAttribute("parents", pm.getAll());
+				try {
+					request.setAttribute("parents", pm.getAll());
+				} catch (ProductException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("Excption_in_product");
+					//e.printStackTrace();
+				}
 				request.setAttribute("pageName", "create_product");
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 				rd.forward(request, response);
@@ -478,16 +470,10 @@ public class FrontController extends HttpServlet {
 		 * storing the values in database
 		 */
 		else if (requestUrl.endsWith(ADMIN_PRODUCT_STORE)) {
-
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -505,22 +491,23 @@ public class FrontController extends HttpServlet {
 					pModel.insert(p);
 				} catch (ProductException e) {
 					// TODO Auto-generated catch block
-					request.setAttribute("message", "Product already exist");
+					cookie.setValue("Product_already_exist");
+					//request.setAttribute("message", "Product already exist");
 					flag = 1;
 				} catch (Exception e) {
 
 					e.printStackTrace();
 				}
-				if (flag == 0) {
+				//if (flag == 0) {
 					response.addCookie(cookie);
-					response.sendRedirect(ADMIN_DASHBOARD);
-				} else {
+					response.sendRedirect(ADMIN_PRODUCT_ALL);
+				/*} else {
 
 					request.setAttribute("pageName", "home");
 					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 					rd.forward(request, response);
 
-				}
+				}*/
 
 			}
 		}
@@ -529,15 +516,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_PRODUCT_ALL)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -560,25 +542,37 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_PRODUCT_EDIT_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
-
+				Cookie cookie = new Cookie("message", "product_updated");
+				cookie.setMaxAge(9);
 				UserModel u = new UserModel();
 				request.setAttribute("users", u.getAll());
 				ProductModel pModel = new ProductModel();
-				Product p = pModel.getById(Integer.parseInt(request.getParameter("id")));
+				Product p = null;
+				try {
+					p = pModel.getById(Integer.parseInt(request.getParameter("id")));
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ProductException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("Exception_occured");
+					//e.printStackTrace();
+				}
 				request.setAttribute("product", p);
 
-				request.setAttribute("parents", pModel.getAll());
+				try {
+					request.setAttribute("parents", pModel.getAll());
+				} catch (ProductException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("duplicate_value");
+					//e.printStackTrace();
+				}
 				request.setAttribute("pageName", "edit_product");
+				response.addCookie(cookie);
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 				rd.forward(request, response);
 			}
@@ -589,15 +583,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_PRODUCT_EDIT_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				ProductModel pModel = new ProductModel();
 				Product p = new Product();
@@ -614,14 +603,14 @@ public class FrontController extends HttpServlet {
 				try {
 					flag = (int) pModel.updateById(p.getProductId(), p);
 				} catch (Exception e) {
-					cookie.setValue("Some_error_occured");
+					cookie.setValue("duplicate_values");
 					request.setAttribute("message", "Some error occured !!");
 					e.printStackTrace();
 				}
 
 				response.addCookie(cookie);
 				request.setAttribute("message", "product updated successfully ");
-				response.sendRedirect(ADMIN_DASHBOARD);
+				response.sendRedirect(ADMIN_PRODUCT_ALL);
 
 			}
 
@@ -632,13 +621,7 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_PRODUCT_REMOVE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -657,7 +640,7 @@ public class FrontController extends HttpServlet {
 				if (flag == 1) {
 					response.addCookie(cookie);
 					request.setAttribute("message", "product removed successfully ");
-					response.sendRedirect(ADMIN_DASHBOARD);
+					response.sendRedirect(ADMIN_PRODUCT_ALL);
 				}
 
 			}
@@ -669,15 +652,10 @@ public class FrontController extends HttpServlet {
 		 */
 
 		else if (requestUrl.endsWith(ADMIN_TICKETTYPE_FORM)) {
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 
 				request.setAttribute("pageName", "create_tickettype");
@@ -692,15 +670,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_TICKETTYPE_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -714,19 +687,19 @@ public class FrontController extends HttpServlet {
 				try {
 					ttModel.insert(tt);
 				} catch (Exception e) {
-					request.setAttribute("message", "tickettype already exists");
+					cookie.setValue("tickettype_already_exists");
 					flag = 1;
 				}
-				if (flag == 0) {
+				//if (flag == 0) {
 					response.addCookie(cookie);
-					response.sendRedirect(ADMIN_DASHBOARD);
+					response.sendRedirect(ADMIN_TICKETTYPE_ALL);
 
-				} else {
+				/*} else {
 					request.setAttribute("pageName", "create_tickettype");
 					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 					rd.forward(request, response);
 
-				}
+				}*/
 			}
 		}
 		/**
@@ -734,15 +707,10 @@ public class FrontController extends HttpServlet {
 		 */
 
 		else if (requestUrl.endsWith(ADMIN_TICKETTYPE_ALL)) {
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -766,15 +734,9 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_TICKETTYPE_EDIT_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
 
 				TicketTypesModel ttModel = new TicketTypesModel();
@@ -792,15 +754,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_TICKETTYPE_EDIT_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				TicketTypesModel ttModel = new TicketTypesModel();
 				TicketType t = new TicketType();
@@ -814,7 +771,8 @@ public class FrontController extends HttpServlet {
 				try {
 					flag = (int) ttModel.updateById(t.getTicketTypeId(), t);
 				} catch (Exception e) {
-					request.setAttribute("message", "Some error occured !!");
+					cookie.setValue("tickettypename_already_exists");
+					//request.setAttribute("message", "Some error occured !!");
 					e.printStackTrace();
 				}
 
@@ -824,7 +782,7 @@ public class FrontController extends HttpServlet {
 
 				request.setAttribute("message", "ticket type updated successfully ");
 				response.addCookie(cookie);
-				response.sendRedirect(ADMIN_DASHBOARD);
+				response.sendRedirect(ADMIN_TICKETTYPE_ALL);
 
 				// }
 
@@ -836,13 +794,7 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_TICKETTYPE_REMOVE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -861,7 +813,7 @@ public class FrontController extends HttpServlet {
 				if (flag == 1) {
 					response.addCookie(cookie);
 					request.setAttribute("message", "ticket type removed successfully ");
-					response.sendRedirect(ADMIN_DASHBOARD);
+					response.sendRedirect(ADMIN_TICKETTYPE_ALL);
 				}
 			}
 
@@ -872,22 +824,42 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_TICKET_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
+				
 			} else {
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
 				DepartmentModel dptModel = new DepartmentModel();
-				request.setAttribute("departments", dptModel.getAll());
+				try {
+					request.setAttribute("departments", dptModel.getAll());
+				} catch (DepartmentException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+					//e1.printStackTrace();
+				}
+				
 				ProductModel pdModel = new ProductModel();
-				request.setAttribute("products", pdModel.getAll());
+				try {
+					request.setAttribute("products", pdModel.getAll());
+				} catch (ProductException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("Exception_occured_in_product");
+					//e1.printStackTrace();
+				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				request.setAttribute("tickettypes", ttModel.getAll());
+				
+				
+				try {
+					request.setAttribute("tickettypes", ttModel.getAll());
+				} catch (TicketTypeException e) {
+					// TODO Auto-generated catch block
+				cookie.setValue("error_occured");
+					//	e.printStackTrace();
+				}
+				response.addCookie(cookie);
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
 
@@ -905,15 +877,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_TICKET_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -927,22 +894,33 @@ public class FrontController extends HttpServlet {
 				
 				t.setProducts("0");
 				if(request.getParameter("product") != null) {
-						p = pm.getById(Integer.parseInt(request.getParameter("product")));
+					// if pdcr is not selected
+						try {
+							p = pm.getById(Integer.parseInt(request.getParameter("product")));
+						} catch (NumberFormatException e) {
+							// TODO Auto-generated catch block
+							//e.printStackTrace();
+						} catch (ProductException e) {
+							// TODO Auto-generated catch block
+							cookie.setValue("Expection_occured_in");
+							//e.printStackTrace();
+						}
 						t.setProductId(Integer.parseInt(request.getParameter("product")));
 						
 				}
 				else {
+					//pdcr is selected
 					t.setProductId(0);
 					String[] products = request.getParameterValues("products");
 					StringBuilder pids = new StringBuilder("");
 					for(String s:products) {
 						pids.append(s + ",");
 					}
-					pids.setCharAt(pids.length()-1, ' ');
+					pids.setCharAt(pids.length()-1, ' ');					//remove comma
 					System.out.print(pids);
 					
 					
-					t.setProducts(pids.toString());
+					t.setProducts(pids.toString());//setting products instead of product as pdcr can have multiple products
 				}
 				
 				
@@ -957,6 +935,8 @@ public class FrontController extends HttpServlet {
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
 				
 				if(request.getParameter("assignee").equals("0")) {
+					
+					// default assignee 
 						t.setAssignee(p.getDefaultAssignee());
 				}
 				else {
@@ -966,7 +946,7 @@ public class FrontController extends HttpServlet {
 				try {
 					int id = tModel.insert(t);
 					if(p == null) {
-						tModel.updateKey(id, "PDCR" + "-" + id);
+						tModel.updateKey(id, "PDCR" + "-" + id); //concantate
 					}else {
 						tModel.updateKey(id, p.getProductName() + "-" + id);
 					}
@@ -975,7 +955,7 @@ public class FrontController extends HttpServlet {
 					e.printStackTrace();
 				}
 				response.addCookie(cookie);
-				response.sendRedirect(ADMIN_DASHBOARD);
+				response.sendRedirect(ADMIN_TICKET_ALL);
 
 			}
 
@@ -986,15 +966,10 @@ public class FrontController extends HttpServlet {
 
 		else if (requestUrl.endsWith(ADMIN_TICKET_ALL)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -1021,23 +996,40 @@ public class FrontController extends HttpServlet {
 
 		else if (requestUrl.endsWith(ADMIN_TICKET_EDIT_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
 
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
 				DepartmentModel dptModel = new DepartmentModel();
-				request.setAttribute("departments", dptModel.getAll());
+				try {
+					request.setAttribute("departments", dptModel.getAll());
+				} catch (DepartmentException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+					//e1.printStackTrace();
+				}
 				ProductModel pdModel = new ProductModel();
-				request.setAttribute("products", pdModel.getAll());
+				try {
+					request.setAttribute("products", pdModel.getAll());
+				} catch (ProductException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("Exception_occured");
+					//e1.printStackTrace();
+				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				request.setAttribute("tickettypes", ttModel.getAll());
+				
+				
+				try {
+					request.setAttribute("tickettypes", ttModel.getAll());
+				} catch (TicketTypeException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+					//e.printStackTrace();
+				}
+				
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
 
@@ -1045,8 +1037,17 @@ public class FrontController extends HttpServlet {
 				request.setAttribute("userId", session.getAttribute("userId"));// reporter
 
 				TicketModel tModel = new TicketModel();
-				request.setAttribute("ticket", tModel.getById(Integer.parseInt(request.getParameter("id"))));
+				try {
+					request.setAttribute("ticket", tModel.getById(Integer.parseInt(request.getParameter("id"))));
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TicketException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+				}
 				request.setAttribute("pageName", "edit-ticket");
+				response.addCookie(cookie);
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 				rd.forward(request, response);
 			}
@@ -1058,15 +1059,9 @@ public class FrontController extends HttpServlet {
 
 		else if (requestUrl.endsWith(ADMIN_TICKET_EDIT_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
 
 				TicketModel tModel = new TicketModel();
@@ -1090,16 +1085,34 @@ public class FrontController extends HttpServlet {
 				
 				System.out.println(t.getTicketId());
 				System.out.println(t.toString());
-				t1 = tModel.getById(t.getTicketId());
 				try {
-					tModel.updateById(t.getTicketId(), t);
-					tModel.updateKey(t1.getTicketId(), t1.getTicketKey());
+					t1 = tModel.getById(t.getTicketId());
+				} catch (TicketException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("expection");
+					//e1.printStackTrace();
+				}
+				try {
+					try {
+						tModel.updateById(t.getTicketId(), t);
+					} catch (TicketException e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
+						cookie.setValue("exception_occured");
+					}
+					try {
+						tModel.updateKey(t1.getTicketId(), t1.getTicketKey());
+					} catch (TicketException e) {
+						// TODO Auto-generated catch block
+						cookie.setValue("exception_found");
+						//e.printStackTrace();
+					}
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				response.addCookie(cookie);
-				response.sendRedirect(ADMIN_DASHBOARD);
+				response.sendRedirect(ADMIN_TICKET_ALL);
 				
 				
 
@@ -1112,13 +1125,7 @@ public class FrontController extends HttpServlet {
 
 		else if (requestUrl.endsWith(ADMIN_TICKET_REMOVE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -1137,7 +1144,7 @@ public class FrontController extends HttpServlet {
 				if (flag == 1) {
 					response.addCookie(cookie);
 					request.setAttribute("message", "ticket  removed successfully ");
-					response.sendRedirect(ADMIN_DASHBOARD);
+					response.sendRedirect(ADMIN_TICKET_ALL);
 				}
 			}
 
@@ -1148,23 +1155,40 @@ public class FrontController extends HttpServlet {
 		 */
 
 		else if (requestUrl.endsWith(EMPLOYEE_TICKET_FORM)) {
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
 				DepartmentModel dptModel = new DepartmentModel();
-				request.setAttribute("departments", dptModel.getAll());
+				try {
+					request.setAttribute("departments", dptModel.getAll());
+				} catch (DepartmentException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+					//e1.printStackTrace();
+				}
 				ProductModel pdModel = new ProductModel();
-				request.setAttribute("products", pdModel.getAll());
+				try {
+					request.setAttribute("products", pdModel.getAll());
+				} catch (ProductException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("Exception_occured_in_product");
+					//e1.printStackTrace();
+				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				request.setAttribute("tickettypes", ttModel.getAll());
-
+				
+				
+				try {
+					request.setAttribute("tickettypes", ttModel.getAll());
+				} catch (TicketTypeException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+					//e.printStackTrace();
+				}
+				
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
 
@@ -1172,6 +1196,7 @@ public class FrontController extends HttpServlet {
 				request.setAttribute("userId", session.getAttribute("userId"));// reporter
 
 				request.setAttribute("pageName", "create_ticket");
+				response.addCookie(cookie);
 				RequestDispatcher rd = request.getRequestDispatcher(path + "employee/dashboard.jsp");
 				rd.forward(request, response);
 
@@ -1183,15 +1208,10 @@ public class FrontController extends HttpServlet {
 		 */
 
 		else if (requestUrl.endsWith(EMPLOYEE_TICKET_STORE)) {
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -1205,7 +1225,16 @@ public class FrontController extends HttpServlet {
 				
 				t.setProducts("0");
 				if(request.getParameter("product") != null) {
-						p = pm.getById(Integer.parseInt(request.getParameter("product")));
+						try {
+							p = pm.getById(Integer.parseInt(request.getParameter("product")));
+						} catch (NumberFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ProductException e) {
+							// TODO Auto-generated catch block
+							cookie.setValue("Product_exception");
+							//e.printStackTrace();
+						}
 						t.setProductId(Integer.parseInt(request.getParameter("product")));
 						
 				}
@@ -1253,7 +1282,7 @@ public class FrontController extends HttpServlet {
 					e.printStackTrace();
 				}
 				response.addCookie(cookie);
-				response.sendRedirect(EMPLOYEE_DASHBOARD);
+				response.sendRedirect(EMPLOYEE_TICKET_ALL);
 
 			}
 		}
@@ -1263,15 +1292,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(EMPLOYEE_TICKET_ALL)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -1298,29 +1322,55 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(EMPLOYEE_TICKET_EDIT_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
-
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
 				DepartmentModel dptModel = new DepartmentModel();
-				request.setAttribute("departments", dptModel.getAll());
+				try {
+					request.setAttribute("departments", dptModel.getAll());
+				} catch (DepartmentException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_has_occured");
+					//e1.printStackTrace();
+				}
 				ProductModel pdModel = new ProductModel();
-				request.setAttribute("products", pdModel.getAll());
+				try {
+					request.setAttribute("products", pdModel.getAll());
+				} catch (ProductException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_has_occured_in_product");
+					//e1.printStackTrace();
+				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				request.setAttribute("tickettypes", ttModel.getAll());
+				
+				
+				try {
+					request.setAttribute("tickettypes", ttModel.getAll());
+				} catch (TicketTypeException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_has_occured");
+					//	e.printStackTrace();
+				}
+				
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
 
 				TicketModel tModel = new TicketModel();
-				request.setAttribute("ticket", tModel.getById(Integer.parseInt(request.getParameter("id"))));
+				try {
+					request.setAttribute("ticket", tModel.getById(Integer.parseInt(request.getParameter("id"))));
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TicketException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+					//e.printStackTrace();
+				}
 				request.setAttribute("pageName", "edit-ticket");
+				response.addCookie(cookie);
 				RequestDispatcher rd = request.getRequestDispatcher(path + "employee/dashboard.jsp");
 				rd.forward(request, response);
 			}
@@ -1331,15 +1381,9 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(EMPLOYEE_TICKET_EDIT_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
 
 				TicketModel tModel = new TicketModel();
@@ -1362,16 +1406,33 @@ public class FrontController extends HttpServlet {
 				t.setDueDate(request.getParameter("dueDate"));
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
 
-				t1 = tModel.getById(t.getTicketId());
 				try {
-					tModel.updateById(t.getTicketId(), t);
-					tModel.updateKey(t1.getTicketId(), t1.getTicketKey());
+					t1 = tModel.getById(t.getTicketId());
+				} catch (TicketException e1) {
+					// TODO Auto-generated catch block
+					cookie.setValue("exception_occured_in_getId");
+				}
+				try {
+					try {
+						tModel.updateById(t.getTicketId(), t);
+					} catch (TicketException e) {
+						// TODO Auto-generated catch block
+					cookie.setValue("exception_occured");
+						//	e.printStackTrace();
+					}
+					try {
+						tModel.updateKey(t1.getTicketId(), t1.getTicketKey());
+					} catch (TicketException e) {
+						// TODO Auto-generated catch block
+						cookie.setValue("updateBykey_exception");
+						//e.printStackTrace();
+					}
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				response.addCookie(cookie);
-				response.sendRedirect(EMPLOYEE_DASHBOARD);
+				response.sendRedirect(EMPLOYEE_TICKET_ALL);
 			}
 
 		}
@@ -1380,13 +1441,7 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(EMPLOYEE_TICKET_REMOVE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -1405,7 +1460,7 @@ public class FrontController extends HttpServlet {
 				if (flag == 1) {
 					response.addCookie(cookie);
 					request.setAttribute("message", "ticket  removed successfully ");
-					response.sendRedirect(EMPLOYEE_DASHBOARD);
+					response.sendRedirect(EMPLOYEE_TICKET_ALL);
 				}
 			}
 
@@ -1415,13 +1470,7 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(FILTER_TICKET_TABLE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -1430,13 +1479,20 @@ public class FrontController extends HttpServlet {
 				String status = request.getParameter("status");
 				String priority = request.getParameter("priority");
 				String assignee = request.getParameter("assignee");
-
-				request.setAttribute("tickets", tModel.byFilter(status, priority, assignee));
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
+				try {
+					request.setAttribute("tickets", tModel.byFilter(status, priority, assignee));
+				} catch (TicketException e) {
+					// TODO Auto-generated catch block
+					cookie.setValue("Exception_occured");
+					//e.printStackTrace();
+				}
 				request.setAttribute("pageName", "all_tickets_table");
 
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
-
+			
 				if (role.equals("admin")) {
 					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 					rd.forward(request, response);
@@ -1444,7 +1500,7 @@ public class FrontController extends HttpServlet {
 					RequestDispatcher rd = request.getRequestDispatcher(path + "employee/dashboard.jsp");
 					rd.forward(request, response);
 				}
-
+				response.addCookie(cookie);
 			}
 
 			/**
@@ -1452,18 +1508,21 @@ public class FrontController extends HttpServlet {
 			 */
 
 		} else if (requestUrl.endsWith(ADMIN_EMPLOYEE_FORM)) {
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
 				DepartmentModel dModel = new DepartmentModel();
-				request.setAttribute("departments", dModel.getAll());
+				try {
+					request.setAttribute("departments", dModel.getAll());
+				} catch (DepartmentException e) {
+					// TODO Auto-generated catch block
+				cookie.setValue("exception_occured");
+					//	e.printStackTrace();
+				}
 
 				request.setAttribute("pageName", "create_employee");
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
@@ -1478,15 +1537,10 @@ public class FrontController extends HttpServlet {
 
 		else if (requestUrl.endsWith(ADMIN_EMPLOYEE_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -1513,7 +1567,7 @@ public class FrontController extends HttpServlet {
 				}
 				if (flag == 0) {
 					response.addCookie(cookie);
-					response.sendRedirect(ADMIN_DASHBOARD);
+					response.sendRedirect(ADMIN_EMPLOYEE_ALL);
 				} else {
 					request.setAttribute("pageName", "home");
 					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
@@ -1527,15 +1581,10 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_EMPLOYEE_ALL)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				// get the session data from database
 
@@ -1558,22 +1607,24 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_EMPLOYEE_EDIT_FORM)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has  Expired  ");
 			} else {
 
 				DepartmentModel dptModel = new DepartmentModel();
-				request.setAttribute("departments", dptModel.getAll());
+				Cookie cookie = new Cookie("message", "");
+				cookie.setMaxAge(9);
+				try {
+					request.setAttribute("departments", dptModel.getAll());
+				} catch (DepartmentException e) {
+					// TODO Auto-generated catch block
+				cookie.setValue("exception_occured");	
+					//e.printStackTrace();
+				}
 				UserModel userModel = new UserModel();
 				request.setAttribute("user", userModel.searchByUserId(Integer.parseInt(request.getParameter("id"))));
-
+				response.addCookie(cookie);
 				request.setAttribute("pageName", "edit_employee");
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 				rd.forward(request, response);
@@ -1585,15 +1636,9 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_EMPLOYEE_EDIT_STORE)) {
 
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... ");
+				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
 			} else {
 
 				UserModel uModel = new UserModel();
@@ -1607,10 +1652,16 @@ public class FrontController extends HttpServlet {
 				u.setPassword(request.getParameter("password"));
 				u.setHomeCompany(request.getParameter("homecompany"));
 				u.setRole(request.getParameter("role"));
-
+				try
+				{
 				uModel.updateUser(u);
+				}
+				catch(Exception e)
+				{
+					cookie.setValue("value_already_exists");
+				}
 				response.addCookie(cookie);
-				response.sendRedirect(ADMIN_DASHBOARD);
+				response.sendRedirect(ADMIN_EMPLOYEE_ALL);
 			}
 
 		} 
@@ -1618,13 +1669,7 @@ public class FrontController extends HttpServlet {
 		 * deleting the employee
 		 */
 		else if (requestUrl.endsWith(ADMIN_EMPLOYEE_REMOVE)) {
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -1643,7 +1688,7 @@ public class FrontController extends HttpServlet {
 				if (flag == 1) {
 					response.addCookie(cookie);
 					request.setAttribute("message", "employee  removed successfully ");
-					response.sendRedirect(ADMIN_DASHBOARD);
+					response.sendRedirect(ADMIN_EMPLOYEE_ALL);
 
 				}
 			}
@@ -1656,13 +1701,13 @@ public class FrontController extends HttpServlet {
 
 			String ssid = (String) session.getAttribute("sessionId");
 			if (ssid != null) {
+				
 				session.invalidate();
-				Cookie cookie = new Cookie("sessionId", "");
-				cookie.setMaxAge(0);
-				response.addCookie(cookie);
 				request.setAttribute("message", "you have logged out successfully");
 			}
-
+			Cookie cookie = new Cookie("sessionId", "");
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
 			response.sendRedirect(LOGIN);
 		}
 
@@ -1675,14 +1720,8 @@ public class FrontController extends HttpServlet {
 		
 		else if(requestUrl.endsWith(UPLOAD_FILE))
 		{
-			
-			Cookie[] cookies = request.getCookies();
-			String ssid = "";
-			for (Cookie c : cookies) {
-				if (c.getName().equals("sessionId")) {
-					ssid = c.getValue();
-				}
-			}
+			//open form
+			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
 			} else {
@@ -1690,7 +1729,7 @@ public class FrontController extends HttpServlet {
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 				rd.forward(request, response);
 			}
-		}else if(requestUrl.endsWith(FILE_UPLOAD_EXCEL)) {
+		}else if(requestUrl.endsWith(FILE_UPLOAD_EXCEL)) { //display file
 			
 			String filename = upload(request,response);
 			System.out.println(filename);
@@ -1706,25 +1745,35 @@ public class FrontController extends HttpServlet {
 			rd.forward(request, response);
 			
 		}
-		else if(requestUrl.endsWith("upload-db.htm")) {
+		else if(requestUrl.endsWith("upload-db.htm")) {//add to db
 			
 			String filename = request.getParameter("filename");
 			System.out.println(filename);
 			List<Object> list = readExcel(filename);
 			
-			
+			Cookie cookie = new Cookie("message", "");
+			cookie.setMaxAge(9);
 			// Converting sheet data
 			TicketTypesModel ttm = new TicketTypesModel();
 			ProductModel pm = new ProductModel();
-			
-			List<Ticket> tickets = new ArrayList<Ticket>(); 
+			UserModel um = new UserModel();
+			List<Ticket> tickets = new ArrayList<Ticket>();  //create a list
 			
 			for(Object o:list) {
 				List<String> data = (ArrayList)o;   //columns
 				int max = data.size();
 				Ticket t = new Ticket();
 				
-				TicketType tt = ttm.getByName(data.get(0));
+				TicketType tt = null;
+				int flag = 0;
+				try {
+					tt = ttm.getByName(data.get(0));
+				} catch (TicketTypeException e) {
+					// TODO Auto-generated catch block
+				cookie.setValue("exception");
+				flag = 1;
+			//		e.printStackTrace();
+				}
 					
 				
 				t.setTicketTypeId(tt.getTicketTypeId());
@@ -1735,12 +1784,11 @@ public class FrontController extends HttpServlet {
 				t.setPriority(data.get(5));
 				t.setStatus(data.get(6));
 				t.setResolution(data.get(7));
-				t.setCreated(data.get(8));
-				t.setUpdated(data.get(9));
+				
 				
 				String[] str = data.get(1).split("-",-2);
 				if(!str[0].equals("PDCR")) {
-					Product p = pm.getByName(str[0]);
+					Product p = pm.getByName(str[0]); // for products
 					t.setProductId(p.getProductId());
 					t.setComponent(0);
 					t.setProducts("0");
@@ -1749,32 +1797,70 @@ public class FrontController extends HttpServlet {
 					
 					t.setProducts("0");
 				}
-				
-				
-				//SimpleDateFormat format = new SimpleDateFormat("dd-M-yy");
+				int k = -1;
+				k = t.getTicketKey().indexOf('-');// key 
+				if(k<0) {
+					flag = 1;
+				}
+				// SimpleDateFormat("dd-M-yy");
 				
 				java.util.Date today= new java.util.Date();
 				t.setDueDate(new SimpleDateFormat("dd-M-yy").format(today));
+				System.out.println("k:"+k);
+				System.out.println(data.get(8)+"|"+data.get(9));
+				try {
+					java.util.Date created = new SimpleDateFormat("dd/MM/yyyy").parse(data.get(8));
+					java.util.Date updated = new SimpleDateFormat("dd/MM/yyyy").parse(data.get(9));
+					
+					t.setCreated(data.get(8));
+					t.setUpdated(data.get(9));
+				}catch(Exception e) {
+					flag = 1;
+					System.out.println("Dates incorrect");
+				}
 				
-				tickets.add(t);
+				
+				System.out.println("flag:"+flag);
+				if(flag == 0) {
+					tickets.add(t);
+				}
+				
 				
 			}
 			
-			// storing to database
+			// storing to database  ticket to db
 			TicketModel ticketModel = new TicketModel();
-			for(Ticket t :tickets) {
+			System.out.println("TS"+tickets.size());
+			for(int i=0;i<tickets.size();i++) {
+				Ticket t = tickets.get(i);
 				int flag = ticketModel.isAlreadyExist(t);
-				if(flag == 1) {
+				int a = um.getUserByName(t.getAssignee());// assignee
+				int r = um.getUserByName(t.getReporter());// reporter
+				
+				Product p=null;
+				try {
+					p = pm.getById(t.getProductId());
+				} catch (ProductException e1) {
+					e1.printStackTrace();
+				}
+				System.out.print("f"+flag+"a"+a +"r"+r+ "PT"+(p.getProductId()>0 || t.getTicketId() == 11)+"T"+t.getTicketTypeId());
+				System.out.println("\t"+t.toString());
+				if(flag == 1 && a == 0 && r==0 && (p.getProductId()>0 || t.getTicketTypeId() == 11)) {
 					try {
-						ticketModel.insert(t);
+						try {
+							ticketModel.insert(t);
+							System.out.println("store\t"+t.toString());
+						} catch (TicketException e) {
+						cookie.setValue("exception_occured");
+							//e.printStackTrace();
+						}
 					} catch (ParseException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 //				System.out.println(t.toString());	
 			}
-			
+			response.addCookie(cookie);
 			System.out.println("Successful ");
 			response.sendRedirect(ADMIN_DASHBOARD);
 		}
@@ -1874,6 +1960,16 @@ public class FrontController extends HttpServlet {
 		return report;
 		//return null;
 		
+	}
+	public String getSSID(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		String ssid = "";
+		for (Cookie c : cookies) {
+			if (c.getName().equals("sessionId")) {
+				ssid = c.getValue();
+			}
+		}
+		return ssid;
 	}
 	
 }

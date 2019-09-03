@@ -12,6 +12,7 @@ import com.ticket.dao.ProductDao;
 import com.ticket.dao.SqlQueries;
 import com.ticket.entity.Product;
 import com.ticket.exceptions.ProductException;
+import com.ticket.exceptions.TicketException;
 
 public class ProductModel implements ProductDao,SqlQueries {
 
@@ -25,7 +26,7 @@ public class ProductModel implements ProductDao,SqlQueries {
 	}
 
 	@Override
-	public Product getById(int productId) {
+	public Product getById(int productId) throws ProductException {
 		Product p=new Product();
 		try {
 			prep=conn.prepareStatement(GET_PRODUCT_BY_ID);
@@ -40,13 +41,15 @@ public class ProductModel implements ProductDao,SqlQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			throw new ProductException("Duplicate data exception "); 
+			//e.printStackTrace();
 		}
 		return p;
 	}
 
 	@Override
-	public int updateById(int productId, Product p) {
+	public int updateById(int productId, Product p) throws ProductException {
 
 		int flag = 0;
 		try {
@@ -58,14 +61,15 @@ public class ProductModel implements ProductDao,SqlQueries {
 			flag = prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ProductException("update by id exception "); 
+			//e.printStackTrace();
 		}
 
 		return flag;
 	}
 
 	@Override
-	public List<Product> getAll() {
+	public List<Product> getAll() throws ProductException {
 
 		List<Product> product = new ArrayList<>();
 		try {
@@ -82,7 +86,8 @@ public class ProductModel implements ProductDao,SqlQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ProductException("getall exception "); 
+			//e.printStackTrace();
 		}
 
 		return product;

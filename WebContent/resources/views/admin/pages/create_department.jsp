@@ -16,7 +16,7 @@
 		
 		<%-- <input type="hidden" name="url" value="<%=Url%>" id="url"/> --%>
 		<div class="form-group">
-			<label> name<span class="alert">*</span></label> <input type="text"
+			<label> name *<span class="alert"> * </span></label> <input type="text"
 				name="departmentname" class="form-control" id="departmentname"
 				required placeholder="Enter department name">
 		</div>

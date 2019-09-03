@@ -18,33 +18,36 @@ public interface UserDao {
 	/*
 	 * get all the users present in the database
 	 */
-	public List<User> getAll();
+	public List<User> getAll() throws UserException;
 	
 	/*
 	 * search by userId
 	 */
-	public User searchByUserId(int userId);
+	public User searchByUserId(int userId) throws UserException;
 	
 	/**
 	 * this function will return the list of users based on the roles;
 	 * @param role
 	 * @return
+	 * @throws UserException 
 	 */
-	public List<User> searchByRoles(String role);
+	public List<User> searchByRoles(String role) throws UserException;
 	
 	/**
 	 * 
 	 * @param userId
 	 * @return
+	 * @throws UserException 
 	 */
-	public int deleteUser(int userId);
+	public int deleteUser(int userId) throws UserException;
 	
 	/**
 	 * 
 	 * @param userId
 	 * @return
+	 * @throws UserException 
 	 */
-	public int updateUser(User u);
+	public int updateUser(User u) throws UserException;
 	
 	/**
 	 * 
@@ -67,6 +70,7 @@ public interface UserDao {
 	 * 
 	 * @param password
 	 * @return
+	 * @throws UserException 
 	 */
-	public int updatePassword(String password,int userId);
+	public int updatePassword(String password,int userId) throws UserException;
 }

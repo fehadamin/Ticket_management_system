@@ -58,20 +58,20 @@
 
 
 <script>
-		$('#mytable').DataTable();
+		
 		$('#downloadReport').on("click",function(){
 			
 			$("#mytable").table2excel({
 				exclude: ".noExl",
 				name:"Worksheet Name",
-				filename:"gfhgfhjj",
+				filename:"xyz",
 				fileext: '.txt',
 				preserveColors :true,
 				
 				
 				
 			});
-			console.log("hi");
+			
 		});
 
 
@@ -121,6 +121,33 @@
 			}
 		
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		// component product matching
+		
 		 $(function() {
 		        $("#product").change(function(){
 		            var element = $(this);
@@ -138,7 +165,7 @@
 		            
 		        });
 	    });
-		
+		 $('#mytable').DataTable();
 </script>
 
 

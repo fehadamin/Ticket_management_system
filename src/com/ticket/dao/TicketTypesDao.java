@@ -17,14 +17,16 @@ public interface TicketTypesDao {
 	/**
 	 *  get all the tickettype row present in the table
 	 * @return
+	 * @throws TicketTypeException 
 	 */
-	public List<TicketType> getAll();
+	public List<TicketType> getAll() throws TicketTypeException;
 	/**
 	 * remove 
 	 * @param ticketTypeId
 	 * @return
+	 * @throws TicketTypeException 
 	 */
-	public int remove(int ticketTypeId);
+	public int remove(int ticketTypeId) throws TicketTypeException;
 	/**
 	 *  get the details of one tickettype row based on TicketType
 	 * @param ticketTypeId
@@ -36,6 +38,7 @@ public interface TicketTypesDao {
 	 * @param ticketTypeId
 	 * @param t
 	 * @return
+	 * @throws TicketTypeException 
 	 */
-	public int updateById(int ticketTypeId,TicketType t);
+	public int updateById(int ticketTypeId,TicketType t) throws TicketTypeException;
 }

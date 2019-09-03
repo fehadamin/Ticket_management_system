@@ -24,7 +24,7 @@
 
 		<div class="form-group">
 			<div id="eresult" style="color: firebrick; display: block;"></div>
-			<label>Ticket Type <span class="alert">*</span></label> <select
+			<label>Ticket Type * <span class="alert">*</span></label> <select
 				class="form-control" name="tickettype" id="tickett"
 				onchange="return compns()" required>
 				<option value="0">Select ...</option>
@@ -41,7 +41,7 @@
 
 		<div class="form-group">
 
-			<label>department <span class="alert">*</span></label> <select
+			<label>department * <span class="alert">*</span></label> <select
 				class="form-control" name="departmentname" id="departmentname"
 				required>
 				<option value="0">Select ...</option>
@@ -57,7 +57,7 @@
 
 		<div class="form-group">
 
-			<label>Product <span class="alert">*</span></label> <select
+			<label>Product * <span class="alert">*</span></label> <select
 				name="product" class="form-control" id="product" required>
 				<option value="0">Select ...</option>
 				<%
@@ -74,7 +74,7 @@
 					for (Product d : products) {
 						if (d.getParent() == 0) {
 				%>
-					<lavel><%=d.getProductName()%></lavel>
+					<label><%=d.getProductName()%></label>
 					<input type="checkbox" name="products" value="<%=d.getProductId()%>" />
 				<%} }%>
 			</div>
@@ -108,7 +108,7 @@
 
 		<div class="form-group">
 
-			<label>priority <span class="alert">*</span></label> <select
+			<label>priority* <span class="alert">*</span></label> <select
 				class="form-control" name="priority" id="priority" required>
 				<option value="0">Select ...</option>
 				<option value="Blocker">Blocker</option>
@@ -118,7 +118,7 @@
 		</div>    
 		<div class="form-group">
 
-			<label>Due date </label> <input type="text" class="form-control"
+			<label>Due date* </label> <input type="text" class="form-control"
 				name="dueDate" id="dueDate" autocomplete="off"  required />
 		</div>
 		<div class="form-group">
@@ -137,7 +137,7 @@
 		</div>
 
 		<div class="form-group">
-			<label>Reporter<span class="alert">*</span></label> <select
+			<label>Reporter *<span class="alert">*</span></label> <select
 				class="form-control" name="reporter" id="reporter" required>
 				<option value="0">Select ...</option>
 				<%

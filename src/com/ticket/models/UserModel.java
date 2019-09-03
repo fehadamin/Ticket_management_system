@@ -28,8 +28,30 @@ public class UserModel implements UserDao,SqlQueries {
 
 	
 	
+  public int getUserByName(String name)
+  {
+	  int flag=0;
+	  try {
+		prep = conn.prepareStatement("select * from users where name=? ");
+		prep.setString(1, name);
+		result=prep.executeQuery();
+	
+		if (result.next() == false) {
+			flag=1;
+			//System.out.println("rs is   empty");
+			
+		}
+		
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	  return flag;
+  }
+	
+	
 	@Override
-	public List<User> getAll() {
+	public List<User> getAll() throws UserException {
 		// TODO Auto-generated method stub
 		List<User> user = new ArrayList<>();
 		
@@ -53,7 +75,8 @@ public class UserModel implements UserDao,SqlQueries {
 			}
 			} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+				throw new UserException("problem in viewing exception");
+			//e.printStackTrace();
 		}
 		
 		
@@ -61,7 +84,7 @@ public class UserModel implements UserDao,SqlQueries {
 	}
 
 	@Override
-	public User searchByUserId(int userId) {
+	public User searchByUserId(int userId) throws UserException {
 		// TODO Auto-generated method stub
 		
 		User u=new User();
@@ -85,13 +108,14 @@ public class UserModel implements UserDao,SqlQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UserException("sql exception");
+			//e.printStackTrace();
 		}
 		return u;
 	}
 
 	@Override
-	public List<User> searchByRoles(String role) {
+	public List<User> searchByRoles(String role) throws UserException {
 		// TODO Auto-generated method stub
 List<User> user = new ArrayList<>();
 		
@@ -116,7 +140,8 @@ List<User> user = new ArrayList<>();
 			}
 			} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+				throw new UserException(" exception in search by roles");
+				//	e.printStackTrace();
 		}
 		
 		
@@ -124,7 +149,7 @@ List<User> user = new ArrayList<>();
 	}
 
 	@Override
-	public int deleteUser(int userId) {
+	public int deleteUser(int userId) throws UserException {
 		// TODO Auto-generated method stub
 		int flag=0;
 		try {
@@ -133,13 +158,14 @@ List<User> user = new ArrayList<>();
 			flag=prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UserException("problem in deleting  user exception");
+			//e.printStackTrace();
 		}
 		return flag;
 	}
 
 	@Override
-	public int updateUser(User u) {
+	public int updateUser(User u) throws UserException {
 		// TODO Auto-generated method stub
 		int flag=0;
 		try {
@@ -156,7 +182,8 @@ List<User> user = new ArrayList<>();
 			flag=prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UserException("problem in updating the user exception");
+			//e.printStackTrace();
 		}
 		return flag;
 	}
@@ -195,7 +222,7 @@ List<User> user = new ArrayList<>();
 
 			if (result.next() == false) {
 				user = null;
-				System.out.println("rs is  empty");
+				System.out.println("rs is   empty");
 				throw  new  UserException("incorrect values");
 				// exception insert
 			} else {
@@ -203,14 +230,15 @@ List<User> user = new ArrayList<>();
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UserException("problem in authenicating the user");
+			//e.printStackTrace();
 		}
 
 		return user;
 
 	}
 
-	private void setUser(User user, ResultSet result2) {
+	private void setUser(User user, ResultSet result2) throws UserException {
 		// TODO Auto-generated method stub
 		// throw exceptions
 		try {
@@ -226,14 +254,15 @@ List<User> user = new ArrayList<>();
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UserException("setuser exception");
+			//e.printStackTrace();
 		}
 		
 		
 	}
 
 	@Override
-	public int updatePassword(String password,int userId) {
+	public int updatePassword(String password,int userId) throws UserException {
 		// TODO Auto-generated method stub
 		int flag=0;
 		
@@ -244,7 +273,8 @@ List<User> user = new ArrayList<>();
 			flag=prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UserException("update password exception");
+			//e.printStackTrace();
 		}
 		
 		return flag;

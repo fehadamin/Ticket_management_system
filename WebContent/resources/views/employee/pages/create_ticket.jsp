@@ -1,3 +1,4 @@
+<%@ taglib prefix = "c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1" import="com.ticket.entity.*,java.util.*"%>
 <%
@@ -27,13 +28,9 @@
 				class="form-control" name="tickettype" id="tickett"
 				onchange="return compns()" required>
 				<option value="0">Select ...</option>
-				<%	
-					for (TicketType tt : tickettypes) {
-				%>
-				<option value="<%=tt.getTicketTypeId()%>"><%=tt.getTicketName()%></option>
-				<%
-					}
-				%>
+				<c:forEach var="tt" items="${tickettypes}">
+					<option value="${tt.getTicketTypeId()}"><c:out value="${tt.getTicketName()}"/></option>
+				</c:forEach>
 			</select>
 		</div>
 
@@ -44,13 +41,9 @@
 				class="form-control" name="departmentname" id="departmentname"
 				required>
 				<option value="0">Select ...</option>
-				<%
-					for (Department d : departments) {
-				%>
-				<option value="<%=d.getDepartmentId()%>"><%=d.getDepartmentName()%></option>
-				<%
-					}
-				%>
+				<c:forEach var="d" items="${departments}">
+					<option value="${d.getDepartmentId()}"><c:out value="${d.getDepartmentName()}"/></option>
+				</c:forEach>
 			</select>
 		</div>
 
@@ -59,24 +52,21 @@
 			<label>Product <span class="alert">*</span></label> <select
 				name="product" class="form-control" id="product" required>
 				<option value="0">Select ...</option>
-				<%
-					for (Product d : products) {
-						if (d.getParent() == 0) {
-				%>
-				<option value="<%=d.getProductId()%>"><%=d.getProductName()%></option>
-				<%
-					}
-					}
-				%>
+				<c:forEach var="d" items="${products}">
+					<c:if test="${d.getParent() == 0 }">
+						<option value="${d.getProductId()}"><c:out value="${d.getProductName()}"/></option>
+					</c:if>
+				</c:forEach>
 			</select>
 			<div id="pds" style="display:none;">
-				<%
-					for (Product d : products) {
-						if (d.getParent() == 0) {
-				%>
-					<lavel><%=d.getProductName()%></lavel>
-					<input type="checkbox" name="products" value="<%=d.getProductId()%>" />
-				<%} }%>
+			
+				<c:forEach var="d" items="${products}">
+					<c:if test="${d.getParent() == 0 }">
+						<lavel><c:out value="${d.getProductName()}"/></lavel>
+						<input type="checkbox" name="products" value="${d.getProductId()}" />
+					</c:if>
+				</c:forEach>
+			
 			</div>
 		</div>
 
@@ -85,18 +75,12 @@
 			<label>Component <span class="alert">*</span></label> <select
 				name="component" class="form-control" required>
 				<option value="0">Select ...</option>
-				<%
-					for (Product d : products) {
-						if (d.getParent() != 0) {
-				%>
-			<%-- 	<option value="<%=d.getProductId()%>"><%=d.getProductName()%></option>
-			 --%>	
-			 <option value="<%=d.getProductId()%>" data-parent="<%=d.getParent()%>"><%=d.getProductName()%></option>
+				<c:forEach var="d" items="${products}">
+					<c:if test="${d.getParent() != 0 }">
+						<option value="${d.getProductId()}" data-parent="${d.getParent()}"><c:out value="${d.getProductName()}"/></option>
+					</c:if>
+				</c:forEach>
 			
-				<%
-					}
-					}
-				%>
 			</select>
 		</div>
 
@@ -128,13 +112,9 @@
 			<label>Assignee<span class="alert">*</span></label> <select
 				class="form-control" name="assignee" id="assignee" >
 				<option value="0">Select ...</option>
-				<%
-					for (User u : users) {
-				%>
-				<option value="<%=u.getName()%>"><%=u.getName()%></option>
-				<%
-					}
-				%>
+				<c:forEach var="u" items="${users}">
+						<option value="${u.getName()}" ><c:out value="${u.getName()}"/></option>
+				</c:forEach>
 			</select>
 			<span>Leave blank for default</span>
 		</div>
@@ -143,13 +123,9 @@
 			<label>Reporter<span class="alert">*</span></label> <select
 				class="form-control" name="reporter" id="reporter" required>
 				<option value="0">Select ...</option>
-				<%
-					for (User u : users) {
-				%>
-				<option value="<%=u.getName()%>"><%=u.getName()%></option>
-				<%
-					}
-				%>
+				<c:forEach var="u" items="${users}">
+						<option value="${u.getName()}" ><c:out value="${u.getName()}"/></option>
+				</c:forEach>
 			</select>
 		</div>
 

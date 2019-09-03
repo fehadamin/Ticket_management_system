@@ -15,27 +15,27 @@
 		<h1>create Employee</h1>
 		<div class="form-group">
 			<div id="eresult" style="color: firebrick; display: block;"></div>
-			<label> name <span class="alert">*</span></label> <input type="text"
+			<label> name* <span class="alert">*</span></label> <input type="text"
 				class="form-control" name="name" id="name" placeholder="Enter name">
 		</div>
 
 		<div class="form-group">
-			<label> username <span class="alert">*</span></label> <input
+			<label> username* <span class="alert">*</span></label> <input
 				type="text" name="username" class="form-control" id="username"
 				placeholder="enter username" />
 		</div>
 		<div class="form-group">
-			<label> email <span class="alert">*</span></label> <input
+			<label> email* <span class="alert">*</span></label> <input
 				type="email" name="email" class="form-control" id="email"
 				placeholder="enter email" />
 		</div>
 		<div class="form-group">
-			<label> password <span class="alert">*</span></label> <input
+			<label> password* <span class="alert">*</span></label> <input
 				type="password" required name="password" id="password"
 				class="form-control" placeholder="enter password" />
 		</div>
 		<div class="form-group">
-			<label> home company <span class="alert">*</span></label> <input
+			<label> home company * <span class="alert">*</span></label> <input
 				type="text" required name="homecompany" id="homecompany"
 				class="form-control" placeholder="enter homecompany" />
 		</div>

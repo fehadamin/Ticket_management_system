@@ -50,7 +50,7 @@
             
             </li>
             <li> <a href="<%=Url%>upload_file.htm"><span class="fa fa-home"></span>UPLOAD</a>   </li>
-			 <li> <a href="<%=Url%>upload_file_store.htm"><span class="fa fa-home"></span>LOG OUT</a>   </li>
+			 <li> <a href="<%=Url%>logout.htm"><span class="fa fa-home"></span>LOG OUT</a>   </li>
 
         </ul>
 

@@ -42,7 +42,7 @@ public class TicketTypesModel implements TicketTypesDao,SqlQueries {
 		return flag;
 	}
 
-	public int updateById(int ticketTypeId,TicketType t) {
+	public int updateById(int ticketTypeId,TicketType t) throws TicketTypeException {
 		// TODO Auto-generated method stub
 		int flag=0;
 		try {
@@ -52,13 +52,14 @@ public class TicketTypesModel implements TicketTypesDao,SqlQueries {
 			flag=prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketTypeException("update by id exception "); 
+			//e.printStackTrace();
 		}
 		return flag;
 	}
 
 	@Override
-	public List<TicketType> getAll() {
+	public List<TicketType> getAll() throws TicketTypeException {
 		// TODO Auto-generated method stub
 		
 		List<TicketType> tickettype=new ArrayList<>();
@@ -74,13 +75,14 @@ public class TicketTypesModel implements TicketTypesDao,SqlQueries {
 				}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketTypeException("viewing exception "); 
+			//e.printStackTrace();
 		}
 		return tickettype;
 	}
 
 	@Override
-	public int remove(int ticketTypeId) {
+	public int remove(int ticketTypeId) throws TicketTypeException {
 		// TODO Auto-generated method stub
 		int flag=0;
 		try {
@@ -89,7 +91,8 @@ public class TicketTypesModel implements TicketTypesDao,SqlQueries {
 			flag=prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketTypeException("remove exception "); 
+			//e.printStackTrace();
 		}
 		
 		return flag;
@@ -110,12 +113,13 @@ public class TicketTypesModel implements TicketTypesDao,SqlQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		return t;
 	}
 
-	public TicketType getByName(String name) {
+	public TicketType getByName(String name) throws TicketTypeException {
 		TicketType p=new TicketType();
 		try {
 			prep=conn.prepareStatement("SELECT * FROM ticket_types WHERE ticket_name = ?");
@@ -129,7 +133,8 @@ public class TicketTypesModel implements TicketTypesDao,SqlQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketTypeException("viewing exception "); 
+			//e.printStackTrace();
 		}
 		return p;
 	}

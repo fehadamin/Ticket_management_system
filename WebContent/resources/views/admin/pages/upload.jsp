@@ -17,9 +17,11 @@
 					placeholder="Enter file key">
 			</div>
   
+  			
+  			
 			<div class="form-group">
 				<label> File Name: <span class="alert"></span></label> <input
-					type="file" class="form-control" name="upload">
+					type="file" class="form-control" name="upload" accept=".xls,.xlsx">
 			</div>
 			<button type="submit">submit</button>
 			</div>

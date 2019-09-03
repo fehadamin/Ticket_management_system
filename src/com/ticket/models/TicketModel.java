@@ -15,6 +15,8 @@ import com.ticket.connection.MyConnectionProvider;
 import com.ticket.dao.SqlQueries;
 import com.ticket.dao.TicketDao;
 import com.ticket.entity.Ticket;
+import com.ticket.exceptions.TicketException;
+import com.ticket.exceptions.TicketTypeException;
 
 public class TicketModel implements TicketDao,SqlQueries{
 
@@ -32,7 +34,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 	
 	
 	@Override
-	public List<Ticket> getAll() {
+	public List<Ticket> getAll() throws TicketException {
 		// TODO Auto-generated method stub
 
 		List<Ticket> ticket = new ArrayList<>();
@@ -61,13 +63,14 @@ public class TicketModel implements TicketDao,SqlQueries{
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketException("Duplicate data exception "); 
+			//e.printStackTrace();
 		}
 
 		return ticket;
 	}
 
-	public int deleteTicket(int ticketId) {
+	public int deleteTicket(int ticketId) throws TicketException {
 		// TODO Auto-generated method stub
 		int flag=0;
 		try {
@@ -76,12 +79,13 @@ public class TicketModel implements TicketDao,SqlQueries{
 			flag=prep.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketException("delete ticket exception "); 
+			//e.printStackTrace();
 		}
 		return flag;
 	}
 	
-	public List<Ticket> byFilter(String status,String priority,String assignee){
+	public List<Ticket> byFilter(String status,String priority,String assignee) throws TicketException{
 		List<Ticket> ticket = new ArrayList<>();
 		try {
 			
@@ -129,7 +133,8 @@ public class TicketModel implements TicketDao,SqlQueries{
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketException("filter exception "); 
+			//e.printStackTrace();
 		}
 
 		return ticket;
@@ -138,7 +143,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 	
 	
 	@Override
-	public int updateById(int ticketId, Ticket t) throws ParseException {
+	public int updateById(int ticketId, Ticket t) throws ParseException, TicketException {
 		// TODO Auto-generated method stub
 		SimpleDateFormat format = new SimpleDateFormat("yy-M-dd");
 		int flag = 0;
@@ -164,12 +169,14 @@ public class TicketModel implements TicketDao,SqlQueries{
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketException("update exception "); 
+			
+			//e.printStackTrace();
 		}
 
 		return flag;
 	}
-	public int updateKey(int id,String key) {
+	public int updateKey(int id,String key) throws TicketException {
 		
 		int flag = 0;
 		try {
@@ -179,13 +186,14 @@ public class TicketModel implements TicketDao,SqlQueries{
 			
 			flag = prep.executeUpdate();
 		}catch(SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			throw new TicketException("updatekey exception "); 
 		}
 		
 		return flag;
 	}
 	@Override
-	public int insert(Ticket t) throws ParseException {
+	public int insert(Ticket t) throws ParseException, TicketException {
 		// TODO Auto-generated method stub
 		SimpleDateFormat format = new SimpleDateFormat("dd-M-yy");
 		int flag = 0;
@@ -217,14 +225,15 @@ public class TicketModel implements TicketDao,SqlQueries{
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketException("insert exception "); 
+			//e.printStackTrace();
 		}
 
 		return flag;
 	}
 
 	@Override
-	public Ticket getById(int ticketId) {
+	public Ticket getById(int ticketId) throws TicketException {
 		// TODO Auto-generated method stub
 		Ticket t = new Ticket();
 		try {
@@ -252,7 +261,8 @@ public class TicketModel implements TicketDao,SqlQueries{
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TicketException("getById exception "); 
+			//e.printStackTrace();
 		}
 
 		return t;
@@ -557,7 +567,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 				flag = 1;// empty
 				System.out.println("rs is  empty");
 			}else {
-				System.out.println("rs availible");
+				System.out.println("rs avaiable");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

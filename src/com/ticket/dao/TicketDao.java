@@ -4,34 +4,39 @@ import java.text.ParseException;
 import java.util.List;
 
 import com.ticket.entity.Ticket;
+import com.ticket.exceptions.TicketException;
 
 public interface TicketDao {
 	
 	/**
 	 * get list of tickets present in the table
 	 * @return
+	 * @throws TicketException 
 	 */
-	public List<Ticket> getAll();
+	public List<Ticket> getAll() throws TicketException;
 	/**
 	 * update  based on  ticketId
 	 * @param ticketId
 	 * @return
 	 * @throws ParseException 
+	 * @throws TicketException 
 	 */
-	public int updateById(int ticketId,Ticket t) throws ParseException;
+	public int updateById(int ticketId,Ticket t) throws ParseException, TicketException;
 	/**
 	 * insert into ticket table
 	 * @param t
 	 * @return
 	 * @throws ParseException 
+	 * @throws TicketException 
 	 */
-	public int insert(Ticket t) throws ParseException;
+	public int insert(Ticket t) throws ParseException, TicketException;
 	/**
 	 *  get by id
 	 * @param ticketId
 	 * @return
+	 * @throws TicketException 
 	 */
-	public Ticket getById(int ticketId);
+	public Ticket getById(int ticketId) throws TicketException;
 	/**
 	 * get By Resolution
 	 * @param ticketId
@@ -114,6 +119,6 @@ public interface TicketDao {
 	public List<Ticket> getByAssignee(String assignee);
 	
 	
-	public int deleteTicket(int ticketId);
+	public int deleteTicket(int ticketId) throws TicketException;
 	
 }
