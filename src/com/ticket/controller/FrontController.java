@@ -42,7 +42,6 @@ import com.ticket.models.TicketModel;
 import com.ticket.models.TicketTypesModel;
 import com.ticket.models.UserModel;
 
-
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -106,6 +105,8 @@ public class FrontController extends HttpServlet {
 	private final static String ADMIN_TICKET_UPDATE_REPORTER = ".htm";
 	private final static String ADMIN_TICKET_UPDATE_ASSIGNEE = ".htm";
 	private final static String ADMIN_TICKET_UPDATE_RESOLUTION = ".htm";
+	
+	private final static String ADMIN_VIEW_TICKET = "single-ticket.htm";
 
 	// employees
 
@@ -122,12 +123,11 @@ public class FrontController extends HttpServlet {
 	private final static String EMPLOYEE_TICKET_UPDATE_REPORTER = ".htm";
 	private final static String EMPLOYEE_TICKET_UPDATE_ASSIGNEE = ".htm";
 	private final static String EMPLOYEE_TICKET_UPDATE_RESOLUTION = ".htm";
-	
 
 	// filters
 
 	private final static String FILTER_TICKET_TABLE = "filter_ticket_side.htm";
-	
+
 	// UPLOAD_FILE
 	private final static String UPLOAD_FILE = "upload_file.htm";
 	private final static String FILE_UPLOAD_EXCEL = "upload_file_store.htm";
@@ -160,7 +160,7 @@ public class FrontController extends HttpServlet {
 		} catch (UserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
+
 		}
 	}
 
@@ -261,12 +261,12 @@ public class FrontController extends HttpServlet {
 		}
 		// department form
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_FORM)) {
-			
+
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
 				response.sendRedirect(LOGIN);
-				
+
 			} else {
 
 				request.setAttribute("pageName", "create_department");
@@ -299,13 +299,13 @@ public class FrontController extends HttpServlet {
 				try {
 					dModel.insert(d);
 				} catch (Exception e) {
-					
+
 					cookie.setValue("department_already_exist");
 					flag = 1;
 				}
 //				if (flag == 0) {
-					response.addCookie(cookie);
-					response.sendRedirect(ADMIN_DEPARTMENT_ALL);
+				response.addCookie(cookie);
+				response.sendRedirect(ADMIN_DEPARTMENT_ALL);
 //				} else {
 //					request.setAttribute("pageName", "home");
 //
@@ -321,7 +321,7 @@ public class FrontController extends HttpServlet {
 		 */
 		else if (requestUrl.endsWith(ADMIN_DEPARTMENT_ALL)) {
 			// checking
-			
+
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
@@ -351,7 +351,8 @@ public class FrontController extends HttpServlet {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 
 				Cookie cookie = new Cookie("message", "");
@@ -366,7 +367,7 @@ public class FrontController extends HttpServlet {
 				} catch (DepartmentException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
 				request.setAttribute("department", d);
 				request.setAttribute("pageName", "edit_department");
@@ -457,7 +458,7 @@ public class FrontController extends HttpServlet {
 				} catch (ProductException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("Excption_in_product");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
 				request.setAttribute("pageName", "create_product");
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
@@ -492,22 +493,24 @@ public class FrontController extends HttpServlet {
 				} catch (ProductException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("Product_already_exist");
-					//request.setAttribute("message", "Product already exist");
+					// request.setAttribute("message", "Product already exist");
 					flag = 1;
 				} catch (Exception e) {
 
 					e.printStackTrace();
 				}
-				//if (flag == 0) {
-					response.addCookie(cookie);
-					response.sendRedirect(ADMIN_PRODUCT_ALL);
-				/*} else {
-
-					request.setAttribute("pageName", "home");
-					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
-					rd.forward(request, response);
-
-				}*/
+				// if (flag == 0) {
+				response.addCookie(cookie);
+				response.sendRedirect(ADMIN_PRODUCT_ALL);
+				/*
+				 * } else {
+				 * 
+				 * request.setAttribute("pageName", "home"); RequestDispatcher rd =
+				 * request.getRequestDispatcher(path + "admin/dashboard.jsp");
+				 * rd.forward(request, response);
+				 * 
+				 * }
+				 */
 
 			}
 		}
@@ -544,7 +547,8 @@ public class FrontController extends HttpServlet {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				Cookie cookie = new Cookie("message", "product_updated");
 				cookie.setMaxAge(9);
@@ -560,7 +564,7 @@ public class FrontController extends HttpServlet {
 				} catch (ProductException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("Exception_occured");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
 				request.setAttribute("product", p);
 
@@ -569,7 +573,7 @@ public class FrontController extends HttpServlet {
 				} catch (ProductException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("duplicate_value");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
 				request.setAttribute("pageName", "edit_product");
 				response.addCookie(cookie);
@@ -690,16 +694,17 @@ public class FrontController extends HttpServlet {
 					cookie.setValue("tickettype_already_exists");
 					flag = 1;
 				}
-				//if (flag == 0) {
-					response.addCookie(cookie);
-					response.sendRedirect(ADMIN_TICKETTYPE_ALL);
+				// if (flag == 0) {
+				response.addCookie(cookie);
+				response.sendRedirect(ADMIN_TICKETTYPE_ALL);
 
-				/*} else {
-					request.setAttribute("pageName", "create_tickettype");
-					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
-					rd.forward(request, response);
-
-				}*/
+				/*
+				 * } else { request.setAttribute("pageName", "create_tickettype");
+				 * RequestDispatcher rd = request.getRequestDispatcher(path +
+				 * "admin/dashboard.jsp"); rd.forward(request, response);
+				 * 
+				 * }
+				 */
 			}
 		}
 		/**
@@ -736,7 +741,8 @@ public class FrontController extends HttpServlet {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 
 				TicketTypesModel ttModel = new TicketTypesModel();
@@ -766,13 +772,12 @@ public class FrontController extends HttpServlet {
 				Cookie cookie = new Cookie("message", "ticketType_updated");
 				cookie.setMaxAge(9);
 
-				
 				int flag = 0;
 				try {
 					flag = (int) ttModel.updateById(t.getTicketTypeId(), t);
 				} catch (Exception e) {
 					cookie.setValue("tickettypename_already_exists");
-					//request.setAttribute("message", "Some error occured !!");
+					// request.setAttribute("message", "Some error occured !!");
 					e.printStackTrace();
 				}
 
@@ -828,7 +833,7 @@ public class FrontController extends HttpServlet {
 			if (ssid.equals("")) {
 				out.println(" Session Expired ... ");
 				response.sendRedirect(LOGIN);
-				
+
 			} else {
 				Cookie cookie = new Cookie("message", "");
 				cookie.setMaxAge(9);
@@ -838,26 +843,25 @@ public class FrontController extends HttpServlet {
 				} catch (DepartmentException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_occured");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
-				
+
 				ProductModel pdModel = new ProductModel();
 				try {
 					request.setAttribute("products", pdModel.getAll());
 				} catch (ProductException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("Exception_occured_in_product");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				
-				
+
 				try {
 					request.setAttribute("tickettypes", ttModel.getAll());
 				} catch (TicketTypeException e) {
 					// TODO Auto-generated catch block
-				cookie.setValue("error_occured");
-					//	e.printStackTrace();
+					cookie.setValue("error_occured");
+					// e.printStackTrace();
 				}
 				response.addCookie(cookie);
 				UserModel userModel = new UserModel();
@@ -889,41 +893,39 @@ public class FrontController extends HttpServlet {
 				ProductModel pm = new ProductModel();
 				Cookie cookie = new Cookie("message", "ticket_added");
 				cookie.setMaxAge(9);
-				
+
 				Product p = null;
-				
+
 				t.setProducts("0");
-				if(request.getParameter("product") != null) {
+				if (request.getParameter("product") != null) {
 					// if pdcr is not selected
-						try {
-							p = pm.getById(Integer.parseInt(request.getParameter("product")));
-						} catch (NumberFormatException e) {
-							// TODO Auto-generated catch block
-							//e.printStackTrace();
-						} catch (ProductException e) {
-							// TODO Auto-generated catch block
-							cookie.setValue("Expection_occured_in");
-							//e.printStackTrace();
-						}
-						t.setProductId(Integer.parseInt(request.getParameter("product")));
-						
-				}
-				else {
-					//pdcr is selected
+					try {
+						p = pm.getById(Integer.parseInt(request.getParameter("product")));
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						// e.printStackTrace();
+					} catch (ProductException e) {
+						// TODO Auto-generated catch block
+						cookie.setValue("Expection_occured_in");
+						// e.printStackTrace();
+					}
+					t.setProductId(Integer.parseInt(request.getParameter("product")));
+
+				} else {
+					// pdcr is selected
 					t.setProductId(0);
 					String[] products = request.getParameterValues("products");
 					StringBuilder pids = new StringBuilder("");
-					for(String s:products) {
+					for (String s : products) {
 						pids.append(s + ",");
 					}
-					pids.setCharAt(pids.length()-1, ' ');					//remove comma
+					pids.setCharAt(pids.length() - 1, ' '); // remove comma
 					System.out.print(pids);
-					
-					
-					t.setProducts(pids.toString());//setting products instead of product as pdcr can have multiple products
+
+					t.setProducts(pids.toString());// setting products instead of product as pdcr can have multiple
+													// products
 				}
-				
-				
+
 				t.setTicketKey(request.getParameter("project"));
 				t.setStatus("open");
 				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
@@ -933,24 +935,23 @@ public class FrontController extends HttpServlet {
 				t.setReporter(request.getParameter("reporter"));
 				t.setResolution("unresolved");
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
-				
-				if(request.getParameter("assignee").equals("0")) {
-					
-					// default assignee 
-						t.setAssignee(p.getDefaultAssignee());
-				}
-				else {
+
+				if (request.getParameter("assignee").equals("0")) {
+
+					// default assignee
+					t.setAssignee(p.getDefaultAssignee());
+				} else {
 					t.setAssignee(request.getParameter("assignee"));
 				}
-				
+
 				try {
 					int id = tModel.insert(t);
-					if(p == null) {
-						tModel.updateKey(id, "PDCR" + "-" + id); //concantate
-					}else {
+					if (p == null) {
+						tModel.updateKey(id, "PDCR" + "-" + id); // concantate
+					} else {
 						tModel.updateKey(id, p.getProductName() + "-" + id);
 					}
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -998,7 +999,8 @@ public class FrontController extends HttpServlet {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 
 				Cookie cookie = new Cookie("message", "");
@@ -1009,7 +1011,7 @@ public class FrontController extends HttpServlet {
 				} catch (DepartmentException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_occured");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				ProductModel pdModel = new ProductModel();
 				try {
@@ -1017,19 +1019,18 @@ public class FrontController extends HttpServlet {
 				} catch (ProductException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("Exception_occured");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				
-				
+
 				try {
 					request.setAttribute("tickettypes", ttModel.getAll());
 				} catch (TicketTypeException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_occured");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
-				
+
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
 
@@ -1061,7 +1062,8 @@ public class FrontController extends HttpServlet {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 
 				TicketModel tModel = new TicketModel();
@@ -1069,7 +1071,7 @@ public class FrontController extends HttpServlet {
 				Cookie cookie = new Cookie("message", "ticket_edited");
 				cookie.setMaxAge(9);
 				Ticket t1 = new Ticket();
-				
+
 				t.setTicketId(Integer.parseInt(request.getParameter("id")));
 				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setTicketKey(request.getParameter("project"));
@@ -1082,7 +1084,7 @@ public class FrontController extends HttpServlet {
 				t.setResolution("unresolved");
 				t.setDueDate(request.getParameter("dueDate"));
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
-				
+
 				System.out.println(t.getTicketId());
 				System.out.println(t.toString());
 				try {
@@ -1090,14 +1092,14 @@ public class FrontController extends HttpServlet {
 				} catch (TicketException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("expection");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				try {
 					try {
 						tModel.updateById(t.getTicketId(), t);
 					} catch (TicketException e) {
 						// TODO Auto-generated catch block
-						//e.printStackTrace();
+						// e.printStackTrace();
 						cookie.setValue("exception_occured");
 					}
 					try {
@@ -1105,7 +1107,7 @@ public class FrontController extends HttpServlet {
 					} catch (TicketException e) {
 						// TODO Auto-generated catch block
 						cookie.setValue("exception_found");
-						//e.printStackTrace();
+						// e.printStackTrace();
 					}
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -1113,10 +1115,8 @@ public class FrontController extends HttpServlet {
 				}
 				response.addCookie(cookie);
 				response.sendRedirect(ADMIN_TICKET_ALL);
-				
-				
 
-							}
+			}
 
 		}
 		/**
@@ -1168,7 +1168,7 @@ public class FrontController extends HttpServlet {
 				} catch (DepartmentException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_occured");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				ProductModel pdModel = new ProductModel();
 				try {
@@ -1176,19 +1176,18 @@ public class FrontController extends HttpServlet {
 				} catch (ProductException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("Exception_occured_in_product");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				
-				
+
 				try {
 					request.setAttribute("tickettypes", ttModel.getAll());
 				} catch (TicketTypeException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_occured");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
-				
+
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
 
@@ -1220,39 +1219,36 @@ public class FrontController extends HttpServlet {
 				ProductModel pm = new ProductModel();
 				Cookie cookie = new Cookie("message", "Ticked_added");
 				cookie.setMaxAge(9);
-				
+
 				Product p = null;
-				
+
 				t.setProducts("0");
-				if(request.getParameter("product") != null) {
-						try {
-							p = pm.getById(Integer.parseInt(request.getParameter("product")));
-						} catch (NumberFormatException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ProductException e) {
-							// TODO Auto-generated catch block
-							cookie.setValue("Product_exception");
-							//e.printStackTrace();
-						}
-						t.setProductId(Integer.parseInt(request.getParameter("product")));
-						
-				}
-				else {
+				if (request.getParameter("product") != null) {
+					try {
+						p = pm.getById(Integer.parseInt(request.getParameter("product")));
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ProductException e) {
+						// TODO Auto-generated catch block
+						cookie.setValue("Product_exception");
+						// e.printStackTrace();
+					}
+					t.setProductId(Integer.parseInt(request.getParameter("product")));
+
+				} else {
 					t.setProductId(0);
 					String[] products = request.getParameterValues("products");
 					StringBuilder pids = new StringBuilder("");
-					for(String s:products) {
+					for (String s : products) {
 						pids.append(s + ",");
 					}
-					pids.setCharAt(pids.length()-1, ' ');
+					pids.setCharAt(pids.length() - 1, ' ');
 					System.out.print(pids);
-					
-					
+
 					t.setProducts(pids.toString());
 				}
-				
-				
+
 				t.setTicketKey(request.getParameter("project"));
 				t.setStatus("open");
 				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
@@ -1262,20 +1258,18 @@ public class FrontController extends HttpServlet {
 				t.setReporter(request.getParameter("reporter"));
 				t.setResolution("unresolved");
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
-				
-				if(request.getParameter("assignee").equals("0")) {
+
+				if (request.getParameter("assignee").equals("0")) {
 					t.setAssignee(p.getDefaultAssignee());
-				}
-				else {
+				} else {
 					t.setAssignee(request.getParameter("assignee"));
 				}
-				
-				
+
 				try {
 					int id = tModel.insert(t);
-					if(p == null) {
+					if (p == null) {
 						tModel.updateKey(id, "PDCR" + "-" + id);
-					}else {
+					} else {
 						tModel.updateKey(id, p.getProductName() + "-" + id);
 					}
 				} catch (Exception e) {
@@ -1324,7 +1318,8 @@ public class FrontController extends HttpServlet {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 				Cookie cookie = new Cookie("message", "");
 				cookie.setMaxAge(9);
@@ -1334,7 +1329,7 @@ public class FrontController extends HttpServlet {
 				} catch (DepartmentException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_has_occured");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				ProductModel pdModel = new ProductModel();
 				try {
@@ -1342,19 +1337,18 @@ public class FrontController extends HttpServlet {
 				} catch (ProductException e1) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_has_occured_in_product");
-					//e1.printStackTrace();
+					// e1.printStackTrace();
 				}
 				TicketTypesModel ttModel = new TicketTypesModel();
-				
-				
+
 				try {
 					request.setAttribute("tickettypes", ttModel.getAll());
 				} catch (TicketTypeException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_has_occured");
-					//	e.printStackTrace();
+					// e.printStackTrace();
 				}
-				
+
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
 
@@ -1367,7 +1361,7 @@ public class FrontController extends HttpServlet {
 				} catch (TicketException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("exception_occured");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
 				request.setAttribute("pageName", "edit-ticket");
 				response.addCookie(cookie);
@@ -1383,7 +1377,8 @@ public class FrontController extends HttpServlet {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 
 				TicketModel tModel = new TicketModel();
@@ -1417,15 +1412,15 @@ public class FrontController extends HttpServlet {
 						tModel.updateById(t.getTicketId(), t);
 					} catch (TicketException e) {
 						// TODO Auto-generated catch block
-					cookie.setValue("exception_occured");
-						//	e.printStackTrace();
+						cookie.setValue("exception_occured");
+						// e.printStackTrace();
 					}
 					try {
 						tModel.updateKey(t1.getTicketId(), t1.getTicketKey());
 					} catch (TicketException e) {
 						// TODO Auto-generated catch block
 						cookie.setValue("updateBykey_exception");
-						//e.printStackTrace();
+						// e.printStackTrace();
 					}
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -1486,13 +1481,13 @@ public class FrontController extends HttpServlet {
 				} catch (TicketException e) {
 					// TODO Auto-generated catch block
 					cookie.setValue("Exception_occured");
-					//e.printStackTrace();
+					// e.printStackTrace();
 				}
 				request.setAttribute("pageName", "all_tickets_table");
 
 				UserModel userModel = new UserModel();
 				request.setAttribute("users", userModel.getAll());
-			
+
 				if (role.equals("admin")) {
 					RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 					rd.forward(request, response);
@@ -1520,8 +1515,8 @@ public class FrontController extends HttpServlet {
 					request.setAttribute("departments", dModel.getAll());
 				} catch (DepartmentException e) {
 					// TODO Auto-generated catch block
-				cookie.setValue("exception_occured");
-					//	e.printStackTrace();
+					cookie.setValue("exception_occured");
+					// e.printStackTrace();
 				}
 
 				request.setAttribute("pageName", "create_employee");
@@ -1556,7 +1551,7 @@ public class FrontController extends HttpServlet {
 				u.setHomeCompany(request.getParameter("homecompany"));
 				u.setRole(request.getParameter("role"));
 				int flag = 0;
-				
+
 				System.out.println(request.getParameter("role"));
 				try {
 
@@ -1603,7 +1598,7 @@ public class FrontController extends HttpServlet {
 			}
 		}
 		/**
-		 *  edit form
+		 * edit form
 		 */
 		else if (requestUrl.endsWith(ADMIN_EMPLOYEE_EDIT_FORM)) {
 
@@ -1619,8 +1614,8 @@ public class FrontController extends HttpServlet {
 					request.setAttribute("departments", dptModel.getAll());
 				} catch (DepartmentException e) {
 					// TODO Auto-generated catch block
-				cookie.setValue("exception_occured");	
-					//e.printStackTrace();
+					cookie.setValue("exception_occured");
+					// e.printStackTrace();
 				}
 				UserModel userModel = new UserModel();
 				request.setAttribute("user", userModel.searchByUserId(Integer.parseInt(request.getParameter("id"))));
@@ -1632,13 +1627,14 @@ public class FrontController extends HttpServlet {
 
 		}
 		/*
-		 *	storing in database
+		 * storing in database
 		 */
 		else if (requestUrl.endsWith(ADMIN_EMPLOYEE_EDIT_STORE)) {
 
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
-				out.println(" Session has  Expired ... "); response.sendRedirect(LOGIN);
+				out.println(" Session has  Expired ... ");
+				response.sendRedirect(LOGIN);
 			} else {
 
 				UserModel uModel = new UserModel();
@@ -1652,19 +1648,16 @@ public class FrontController extends HttpServlet {
 				u.setPassword(request.getParameter("password"));
 				u.setHomeCompany(request.getParameter("homecompany"));
 				u.setRole(request.getParameter("role"));
-				try
-				{
-				uModel.updateUser(u);
-				}
-				catch(Exception e)
-				{
+				try {
+					uModel.updateUser(u);
+				} catch (Exception e) {
 					cookie.setValue("value_already_exists");
 				}
 				response.addCookie(cookie);
 				response.sendRedirect(ADMIN_EMPLOYEE_ALL);
 			}
 
-		} 
+		}
 		/**
 		 * deleting the employee
 		 */
@@ -1701,7 +1694,7 @@ public class FrontController extends HttpServlet {
 
 			String ssid = (String) session.getAttribute("sessionId");
 			if (ssid != null) {
-				
+
 				session.invalidate();
 				request.setAttribute("message", "you have logged out successfully");
 			}
@@ -1709,18 +1702,79 @@ public class FrontController extends HttpServlet {
 			cookie.setMaxAge(0);
 			response.addCookie(cookie);
 			response.sendRedirect(LOGIN);
-		}
+		} else if (requestUrl.endsWith("report.htm")) {
+			String ssid = getSSID(request);
+			if (ssid.equals("")) {
+				out.println(" Session Expired ... ");
+				response.sendRedirect(LOGIN);
+			} else {
+				// get the session data from database
 
-		else if (requestUrl.endsWith(EMPLOYEE_DASHBOARD)) {
+				TicketModel tModel = new TicketModel();
+				UserModel userModel = new UserModel();
+				request.setAttribute("users", userModel.getAll());
+				try {
+					request.setAttribute("tickets", tModel.getAll());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					request.setAttribute("message", "Some error occured");
+					e.printStackTrace();
+				}
+				// request.setAttribute("pageName", "report");
+				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/pages/report.jsp");
+				rd.forward(request, response);
+
+			}
+
+		} else if (requestUrl.endsWith(EMPLOYEE_DASHBOARD)) {
 			request.setAttribute("pageName", "home");
 			RequestDispatcher rd = request.getRequestDispatcher(path + "employee/dashboard.jsp");
 			rd.forward(request, response);
 
 		}
-		
-		else if(requestUrl.endsWith(UPLOAD_FILE))
-		{
-			//open form
+		else if(requestUrl.endsWith(ADMIN_VIEW_TICKET)) {
+			int id = Integer.parseInt(request.getParameter("id"));
+			Cookie cookie = new Cookie("message","");
+			cookie.setMaxAge(10);
+			
+			
+			TicketTypesModel ttsModel = new TicketTypesModel();
+			UserModel userModel = new UserModel();
+			ProductModel pdModel = new ProductModel();
+			
+			TicketModel tModel = new TicketModel();
+			Ticket t = null;
+			try {
+				t = tModel.getById(id);
+			} catch (TicketException e) {
+				// TODO Auto-generated catch block
+				cookie.setValue("Ticket_not_found");
+			}
+			
+			
+			request.setAttribute("ticket", t);
+			try {
+				request.setAttribute("tickettypes", ttsModel.getAll());
+			} catch (TicketTypeException e) {
+				// TODO Auto-generated catch block
+				cookie.setValue("Ticket_types_not_found");
+			}
+			
+			response.addCookie(cookie);
+			request.setAttribute("users", userModel.getAll());
+			try {
+				request.setAttribute("products", pdModel.getAll());
+			} catch (ProductException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			request.setAttribute("pageName", "ticket-view");
+			RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
+			rd.forward(request, response);
+		}
+
+		else if (requestUrl.endsWith(UPLOAD_FILE)) {
+			// open form
 			String ssid = getSSID(request);
 			if (ssid.equals("")) {
 				out.println(" Session has Expired  ");
@@ -1729,53 +1783,51 @@ public class FrontController extends HttpServlet {
 				RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 				rd.forward(request, response);
 			}
-		}else if(requestUrl.endsWith(FILE_UPLOAD_EXCEL)) { //display file
-			
-			String filename = upload(request,response);
+		} else if (requestUrl.endsWith(FILE_UPLOAD_EXCEL)) { // display file
+
+			String filename = upload(request, response);
 			System.out.println(filename);
 			List<Object> list = readExcel(filename);
-			
-			
+
 			System.out.print(list.toString());
-			
+
 			request.setAttribute("filename", filename);
 			request.setAttribute("report", list);
 			request.setAttribute("pageName", "upload-show");
 			RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 			rd.forward(request, response);
-			
-		}
-		else if(requestUrl.endsWith("upload-db.htm")) {//add to db
-			
+
+		} else if (requestUrl.endsWith("upload-db.htm")) {// add to db
+
 			String filename = request.getParameter("filename");
 			System.out.println(filename);
 			List<Object> list = readExcel(filename);
-			
-			Cookie cookie = new Cookie("message", "");
+
+			Cookie cookie = new Cookie("message", "Records_added_successfully");
 			cookie.setMaxAge(9);
 			// Converting sheet data
 			TicketTypesModel ttm = new TicketTypesModel();
 			ProductModel pm = new ProductModel();
 			UserModel um = new UserModel();
-			List<Ticket> tickets = new ArrayList<Ticket>();  //create a list
+			List<Ticket> tickets = new ArrayList<Ticket>(); // create a list
 			
-			for(Object o:list) {
-				List<String> data = (ArrayList)o;   //columns
+			for(int i=1;i<list.size();i++) {
+//			for (Object o : list) {
+				List<String> data = (ArrayList) list.get(i); // columns
 				int max = data.size();
 				Ticket t = new Ticket();
-				
+
 				TicketType tt = null;
 				int flag = 0;
 				try {
 					tt = ttm.getByName(data.get(0));
 				} catch (TicketTypeException e) {
 					// TODO Auto-generated catch block
-				cookie.setValue("exception");
-				flag = 1;
-			//		e.printStackTrace();
+					cookie.setValue("Ticket_type_incorrect");
+					flag = 1;
+					// e.printStackTrace();
 				}
-					
-				
+
 				t.setTicketTypeId(tt.getTicketTypeId());
 				t.setTicketKey(data.get(1));
 				t.setSummary(data.get(2));
@@ -1784,82 +1836,100 @@ public class FrontController extends HttpServlet {
 				t.setPriority(data.get(5));
 				t.setStatus(data.get(6));
 				t.setResolution(data.get(7));
-				
-				
-				String[] str = data.get(1).split("-",-2);
-				if(!str[0].equals("PDCR")) {
+
+				String[] str = data.get(1).split("-", -2);
+				if (!str[0].equals("PDCR")) {
 					Product p = pm.getByName(str[0]); // for products
 					t.setProductId(p.getProductId());
 					t.setComponent(0);
 					t.setProducts("0");
-				}
-				else {
-					
+				} else {
+
 					t.setProducts("0");
 				}
 				int k = -1;
-				k = t.getTicketKey().indexOf('-');// key 
-				if(k<0) {
+				k = t.getTicketKey().indexOf('-');// key
+				if (k < 0) {
 					flag = 1;
+					cookie.setValue("Ticket_Key_incorrect");
 				}
 				// SimpleDateFormat("dd-M-yy");
-				
-				java.util.Date today= new java.util.Date();
+
+				java.util.Date today = new java.util.Date();
 				t.setDueDate(new SimpleDateFormat("dd-M-yy").format(today));
-				System.out.println("k:"+k);
-				System.out.println(data.get(8)+"|"+data.get(9));
+				System.out.println("k:" + k);
+				System.out.println(data.get(8) + "|" + data.get(9));
 				try {
 					java.util.Date created = new SimpleDateFormat("dd/MM/yyyy").parse(data.get(8));
 					java.util.Date updated = new SimpleDateFormat("dd/MM/yyyy").parse(data.get(9));
-					
+
 					t.setCreated(data.get(8));
 					t.setUpdated(data.get(9));
-				}catch(Exception e) {
+				} catch (Exception e) {
 					flag = 1;
-					System.out.println("Dates incorrect");
+					cookie.setValue("Ticket_Dates_incorrect");
+					// System.out.println("Dates incorrect");
 				}
-				
-				
-				System.out.println("flag:"+flag);
-				if(flag == 0) {
+
+				System.out.println("flag:" + flag);
+				if (flag == 0) {
 					tickets.add(t);
 				}
-				
-				
+
 			}
-			
-			// storing to database  ticket to db
+
+			// storing to database ticket to db
 			TicketModel ticketModel = new TicketModel();
-			System.out.println("TS"+tickets.size());
-			for(int i=0;i<tickets.size();i++) {
+			System.out.println("TS" + tickets.size());
+			for (int i = 0; i < tickets.size(); i++) {
 				Ticket t = tickets.get(i);
 				int flag = ticketModel.isAlreadyExist(t);
 				int a = um.getUserByName(t.getAssignee());// assignee
 				int r = um.getUserByName(t.getReporter());// reporter
-				
-				Product p=null;
+
+				Product p = null;
 				try {
 					p = pm.getById(t.getProductId());
 				} catch (ProductException e1) {
-					e1.printStackTrace();
+					cookie.setValue("Product_name_incorrect");
 				}
-				System.out.print("f"+flag+"a"+a +"r"+r+ "PT"+(p.getProductId()>0 || t.getTicketId() == 11)+"T"+t.getTicketTypeId());
-				System.out.println("\t"+t.toString());
-				if(flag == 1 && a == 0 && r==0 && (p.getProductId()>0 || t.getTicketTypeId() == 11)) {
-					try {
-						try {
-							ticketModel.insert(t);
-							System.out.println("store\t"+t.toString());
-						} catch (TicketException e) {
-						cookie.setValue("exception_occured");
-							//e.printStackTrace();
+				System.out.print("f" + flag + "a" + a + "r" + r + "PT" + (p.getProductId() > 0 || t.getTicketId() == 11)
+						+ "T" + t.getTicketTypeId());
+				System.out.println("\t" + t.toString());
+
+				if (flag == 1) {
+
+					if (a == 0) {
+						if (r == 0) {
+							if ((p.getProductId() > 0 || t.getTicketTypeId() == 11)) {
+								try {
+									try {
+										ticketModel.insert(t);
+										System.out.println("store\t" + t.toString());
+									} catch (TicketException e) {
+										cookie.setValue("Ticket_not_added");
+										// e.printStackTrace();
+									}
+								} catch (ParseException e) {
+									cookie.setValue("Parsering_error_occured");
+								}
+
+							} else {
+								cookie.setValue("Product_not_found");
+							}
+						} else {
+							cookie.setValue("Reporter_not_exist");
 						}
-					} catch (ParseException e) {
-						e.printStackTrace();
+					} else {
+						cookie.setValue("Assignee_not_exist");
 					}
+
+				} else {
+					cookie.setValue("Ticket_already_exist");
 				}
 //				System.out.println(t.toString());	
 			}
+
 			response.addCookie(cookie);
 			System.out.println("Successful ");
 			response.sendRedirect(ADMIN_DASHBOARD);
@@ -1867,16 +1937,13 @@ public class FrontController extends HttpServlet {
 
 	}// end process
 
-	
-	
-	
 	private String upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		ServletContext servletContext = request.getServletContext();
 		String path = servletContext.getRealPath("/");
 		String file_name = null;
 		String tempName = "";
-		
+
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		boolean isMultipartContent = ServletFileUpload.isMultipartContent(request);
@@ -1904,40 +1971,42 @@ public class FrontController extends HttpServlet {
 					if (fileItem.getSize() > 0) {
 						tempName = fileItem.getName();
 						System.out.println(path);
-						fileItem.write(new File("C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"+ fileItem.getName()));
+						fileItem.write(new File(
+								"C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"
+										+ fileItem.getName()));
 					}
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			//response.sendRedirect("admin-upload-data.htm?file="+file_name+"&tmp="+tempName);
+			// response.sendRedirect("admin-upload-data.htm?file="+file_name+"&tmp="+tempName);
 		}
-		
+
 		return tempName;
 	}// end upload
-	
-	public List<Object> readExcel(String filename){
-		
+
+	public List<Object> readExcel(String filename) {
+
 		Workbook workbook = null;
 		List<Object> report = new ArrayList<Object>();
 		try {
-			FileInputStream file = new FileInputStream(new File(
-					"C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"+filename));
+			FileInputStream file = new FileInputStream(
+					new File("C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"
+							+ filename));
 			try {
 				workbook = Workbook.getWorkbook(file);
 				Sheet sheet = workbook.getSheet(0);
 				int rows = sheet.getRows();
 				int col = sheet.getColumns();
-				
-				System.out.println(rows+"|"+col);
-				
-				for(int i=0;i<rows;i++) {
-					
+
+				System.out.println(rows + "|" + col);
+
+				for (int i = 0; i < rows; i++) {
+
 					List<String> columns = new ArrayList<String>();
-					for(int j=0;j<col;j++) {
-						
-						
+					for (int j = 0; j < col; j++) {
+
 						Cell cell1 = sheet.getCell(j, i);
 						System.out.print(cell1.getContents() + "\t");
 						columns.add(cell1.getContents());
@@ -1945,22 +2014,22 @@ public class FrontController extends HttpServlet {
 					System.out.print("\n");
 					report.add(columns);
 				}
-				
+
 			} catch (BiffException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
-		
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return report;
-		//return null;
-		
+		// return null;
+
 	}
+
 	public String getSSID(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		String ssid = "";
@@ -1971,5 +2040,5 @@ public class FrontController extends HttpServlet {
 		}
 		return ssid;
 	}
-	
+
 }

@@ -10,43 +10,15 @@
 	TicketTypesModel ttm = new TicketTypesModel();
 	ProductModel pm = new ProductModel();
 %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
 
-<div>
-
-	<form method="post" action="filter_ticket_side.htm">
-		<label class="filterstext"> Status</label> <select name="status">
-			<option value="0">select..</option>
-			<option value="Open">Open</option>
-			<option value="In Progress">In Progress</option>
-			<option value="Resolved">Resolved</option>
-		</select> <label class="filterstext"> Priority</label> <select name="priority">
-			<option value="0">select..</option>
-			<option value="Blocker">Blocker</option>
-			<option value="Critical">Critical</option>
-			<option value="Major">Major</option>
-		</select> <label class="filterstext"> Assignee</label> <select name="assignee">
-			<option value="0">select..</option>
-			<%
-				for (User u : users) {
-			%>
-			<option value="<%=u.getName()%>"><%=u.getName()%></option>
-			<%
-				}
-			%>
-
-		</select> <input type="submit" class="filters" name="filter" /> <a
-			class="filters" href="admin-ticket-all.htm">reset </a>
-	</form>
-</div>
-
-
-
-
-<div class="res-tab">
-	<h1>all ticket table</h1>
-	<a href="report.htm" >Generate excel file</a>
-	<button id="downloadReport">Download</button>
-	<table id="mytable" class="myTable">
+<table id="mytable" class="myTable">
 		<thead>
 			<!--  <th> Key</th> -->
 			<th>ticket key</th>
@@ -61,13 +33,16 @@
 			<th>Resolution</th>
 			<th>created</th>
 			<th>updated</th>
-			<th>Action</th>
+			
 
 
 		</thead>
 		<tbody>
 			<%
+				response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-Disposition","inline;filename=xyz.xls");
 				List<Ticket> tickets = (ArrayList) request.getAttribute("tickets");
+			ArrayList<Ticket> ticketss = (ArrayList<Ticket>) session.getAttribute("tickets");
 				for (Ticket t : tickets) {
 					System.out.println(t.toString());
 					Product p = pm.getById(t.getProductId());
@@ -75,7 +50,7 @@
 					TicketType tt = ttm.getById(t.getTicketTypeId());
 			%>
 			<tr>
-				<td><a href="<%=Url%>single-ticket.htm?id=<%=t.getTicketId()%>" target="_blank"><%=t.getTicketKey()%></a></td>
+				<td><%=t.getTicketKey()%></td>
 				<td><%=tt.getTicketName()%></td>
 				
 				<td>
@@ -102,16 +77,18 @@
 				<td><%=t.getResolution()%></td>
 				<td><%=t.getCreated()%> </td>
 				<td><%=t.getUpdated() %></td>
-				<td><a
+				<%-- <td><a
 					href="<%=Url%>admin-ticket-edit-form.htm?id=<%=t.getTicketId()%>">edit</a>
 					<a href="<%=Url%>admin-ticket-remove.htm?id=<%=t.getTicketId()%>">delete</a>
-				</td>
+				</td> --%>
 
 			</tr>
 			<%
 				}
-				session.setAttribute("tickets",tickets);
 				%>
 		</tbody>
 	</table>
-</div>
+
+
+</body>
+</html>
