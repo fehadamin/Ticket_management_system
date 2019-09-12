@@ -31,6 +31,7 @@ import com.ticket.entity.Product;
 import com.ticket.entity.Ticket;
 import com.ticket.entity.TicketType;
 import com.ticket.entity.User;
+import com.ticket.entity.Util;
 import com.ticket.exceptions.DepartmentException;
 import com.ticket.exceptions.ProductException;
 import com.ticket.exceptions.TicketException;
@@ -927,7 +928,7 @@ public class FrontController extends HttpServlet {
 				}
 
 				t.setTicketKey(request.getParameter("project"));
-				t.setStatus("open");
+				t.setStatus("Open");
 				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setDueDate(request.getParameter("dueDate"));
 				t.setSummary(request.getParameter("summary"));
@@ -943,9 +944,9 @@ public class FrontController extends HttpServlet {
 				} else {
 					t.setAssignee(request.getParameter("assignee"));
 				}
-
+				int id = 0;
 				try {
-					int id = tModel.insert(t);
+					id = tModel.insert(t);
 					if (p == null) {
 						tModel.updateKey(id, "PDCR" + "-" + id); // concantate
 					} else {
@@ -956,7 +957,8 @@ public class FrontController extends HttpServlet {
 					e.printStackTrace();
 				}
 				response.addCookie(cookie);
-				response.sendRedirect(ADMIN_TICKET_ALL);
+				//response.sendRedirect(ADMIN_TICKET_ALL);
+				out.println(id);
 
 			}
 
@@ -1081,22 +1083,25 @@ public class FrontController extends HttpServlet {
 				t.setPriority(request.getParameter("priority"));
 				t.setProductId(Integer.parseInt(request.getParameter("product")));
 				t.setReporter(request.getParameter("reporter"));
-				t.setResolution("unresolved");
+				t.setResolution(request.getParameter("status").equals("Closed")?"resolved":"unresolved");
 				t.setDueDate(request.getParameter("dueDate"));
 				t.setComponent(Integer.parseInt(request.getParameter("component")));
-
+				t.setCreated(request.getParameter("createdDate"));
+				
+				
 				System.out.println(t.getTicketId());
 				System.out.println(t.toString());
 				try {
 					t1 = tModel.getById(t.getTicketId());
 				} catch (TicketException e1) {
 					// TODO Auto-generated catch block
-					cookie.setValue("expection");
+					cookie.setValue("Expection ticket not updated");
 					// e1.printStackTrace();
 				}
+				int flag = 0;
 				try {
 					try {
-						tModel.updateById(t.getTicketId(), t);
+						flag = tModel.updateById(t.getTicketId(), t);
 					} catch (TicketException e) {
 						// TODO Auto-generated catch block
 						// e.printStackTrace();
@@ -1114,7 +1119,8 @@ public class FrontController extends HttpServlet {
 					e.printStackTrace();
 				}
 				response.addCookie(cookie);
-				response.sendRedirect(ADMIN_TICKET_ALL);
+				out.println(flag);
+				//response.sendRedirect(ADMIN_TICKET_ALL);
 
 			}
 
@@ -1250,7 +1256,7 @@ public class FrontController extends HttpServlet {
 				}
 
 				t.setTicketKey(request.getParameter("project"));
-				t.setStatus("open");
+				t.setStatus("Open");
 				t.setTicketTypeId(Integer.parseInt(request.getParameter("tickettype")));
 				t.setDueDate(request.getParameter("dueDate"));
 				t.setSummary(request.getParameter("summary"));
@@ -1788,16 +1794,66 @@ public class FrontController extends HttpServlet {
 			String filename = upload(request, response);
 			System.out.println(filename);
 			List<Object> list = readExcel(filename);
-
+			
+			List<Integer> flags = new ArrayList<Integer>();
+			List<String> msgs = new ArrayList<String>();
+			
+			for(int i = 1;i<list.size();i++) {
+				List<Object> data = validateRow((ArrayList)list.get(i));
+				String msg = (String) data.get(0);
+				Ticket t = (Ticket) data.get(1);
+				msgs.add(msg);
+				if(msg == "")
+					flags.add(1);
+				else
+					flags.add(0);
+			}
+			
 			System.out.print(list.toString());
 
+			request.setAttribute("flags", flags);
+			request.setAttribute("msgs", msgs);
 			request.setAttribute("filename", filename);
 			request.setAttribute("report", list);
 			request.setAttribute("pageName", "upload-show");
 			RequestDispatcher rd = request.getRequestDispatcher(path + "admin/dashboard.jsp");
 			rd.forward(request, response);
 
-		} else if (requestUrl.endsWith("upload-db.htm")) {// add to db
+		} else if (requestUrl.endsWith("upload-db.htm")) {
+			String filename = request.getParameter("filename");
+			System.out.println(filename);
+			List<Object> list = readExcel(filename);
+			
+			List<Integer> flags = new ArrayList<Integer>();
+			List<String> msgs = new ArrayList<String>();
+			
+			TicketModel ticketModel = new TicketModel();
+			Cookie cookie = new Cookie("message","rows_uploaded_successfully");
+			cookie.setMaxAge(10);
+			for(int i = 1;i<list.size();i++) {
+				List<Object> data = validateRow((ArrayList)list.get(i));
+				String msg = (String) data.get(0);
+				Ticket t = (Ticket) data.get(1);
+				msgs.add(msg);
+				if(msg == "") {
+					int flag = ticketModel.isAlreadyExist(t);
+					if(flag == 1){
+						try {
+							ticketModel.insert(t);
+							System.out.println("store\t" + t.toString());
+						} catch (TicketException e) {
+							cookie.setValue("Ticket_already_exist");
+							// e.printStackTrace();
+						}
+					}
+				}
+				
+			}
+			
+			response.addCookie(cookie);
+			response.sendRedirect(ADMIN_DASHBOARD);
+			
+		}else if (requestUrl.endsWith("upload-db1.htm")) {// add to db depricated
 
 			String filename = request.getParameter("filename");
 			System.out.println(filename);
@@ -1898,7 +1954,7 @@ public class FrontController extends HttpServlet {
 				System.out.println("\t" + t.toString());
 
 				if (flag == 1) {
-
+ 
 					if (a == 0) {
 						if (r == 0) {
 							if ((p.getProductId() > 0 || t.getTicketTypeId() == 11)) {
@@ -1936,7 +1992,141 @@ public class FrontController extends HttpServlet {
 		}
 
 	}// end process
-
+	
+	private List<Object> validateRow(List<String> row) {
+		
+		TicketTypesModel ttm = new TicketTypesModel();
+		ProductModel pm = new ProductModel();
+		UserModel um = new UserModel();
+		int max = row.size();
+		Ticket t = new Ticket();
+		TicketType tt = null;
+		int flag = 0;
+		String message = "";
+		List<Object> data = new ArrayList<Object>();
+		// ticket type
+		try {
+			tt = ttm.getByName(row.get(1));
+			t.setTicketTypeId(tt.getTicketTypeId());
+		} catch (TicketTypeException e) {
+			// TODO Auto-generated catch block
+			message = "Ticket Type not found";
+			flag = 1;
+		}catch(Exception e) {
+			message = "Ticket Type not found";
+		}
+		
+		if(!row.get(1).equals("PDCR")) {
+			
+			// product
+			try {
+				Product p = pm.getByName(row.get(2));
+				if(p != null) 
+					t.setProductId(p.getProductId());
+				else 
+					message = message + ", Product not found";
+			}catch(Exception e) {
+				message = message + ", Product not found";
+			}
+			
+			// component
+			try {
+				Product p = pm.getByName(row.get(3));
+				if(p != null) 
+					t.setProductId(p.getProductId());
+				else 
+					message = message + ", Component not found";
+			}catch(Exception e) {
+				message = message + ", Component not found";
+			}
+			
+		}else {
+			//message += "nd";
+		}
+		
+		// priority
+		if(row.get(5).equals("Blocker") || row.get(5).equals("Critical") || row.get(5).equals("Major"))
+		{
+			t.setPriority(row.get(5));
+		}else {
+			message = message + ", Priority incorrect";
+		}
+		
+		// status, resulation
+		if(row.get(8).equals("Open") || row.get(8).equals("Closed") || row.get(8).equals("In Progress") || row.get(8).equals("Resolved"))
+		{
+			t.setStatus(row.get(8));
+			t.setResolution("unresolved");
+		}else {
+			message = message + ", Status incorrect";
+		}
+		
+		// assignee
+		try {
+			int a = um.getUserByName(row.get(6));
+			if(a== 0)
+				t.setAssignee(row.get(6));
+			else
+				message = message + ", Assignee not found";
+		}catch(Exception e) {
+			message = message + ", Assignee not found";
+		}
+		
+		// reporter
+		try {
+			int a = um.getUserByName(row.get(7));
+			if(a== 0)
+				t.setReporter(row.get(7));
+			else
+				message = message + ", Reporter not found";
+			
+		}catch(Exception e) {
+			message = message + ", Reporter not found";
+		}
+		
+		// ticket key	
+		int k = -1;
+		k = row.get(0).indexOf('-');// key
+		if (k < 0) {
+			message = message + ", Ticket key incorrect";
+		}else {
+			t.setTicketKey(row.get(0));
+		}
+		
+		// summary
+		t.setSummary(row.get(4));
+		t.setProducts("0");
+		// dates
+		try {
+			java.util.Date due = new SimpleDateFormat("dd/MM/yyyy").parse(row.get(9));
+			java.util.Date created = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(row.get(10));
+			java.util.Date updated = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(row.get(11));
+			
+			if(Util.getDays(row.get(10), row.get(9)) > 0) {
+				t.setDueDate(new SimpleDateFormat("dd-M-yy").format(due));
+				t.setCreated(new SimpleDateFormat("dd-M-yy HH:mm:ss").format(created));
+				t.setUpdated(new SimpleDateFormat("dd-M-yy HH:mm:ss").format(updated));
+			}
+			
+		} catch (Exception e) {
+			message = message + ", Problem in due date and created date";
+			e.printStackTrace();
+		}
+		
+		
+		TicketModel ticketModel = new TicketModel();
+		int f = ticketModel.isAlreadyExist(t);
+		if(f==0) {
+			message = message + ", Duplicate ticket";
+		}
+		
+		data.add(message);
+		data.add(t);
+		System.out.println("MESSAGE:"+message);
+		System.out.println("TICKET:"+t.toString());
+		return data;
+	}
+	
 	private String upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		ServletContext servletContext = request.getServletContext();
@@ -1971,9 +2161,8 @@ public class FrontController extends HttpServlet {
 					if (fileItem.getSize() > 0) {
 						tempName = fileItem.getName();
 						System.out.println(path);
-						fileItem.write(new File(
-								"C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"
-										+ fileItem.getName()));
+						// "C:\\Users\\fehad\\eclipse-workspace\\Ticket_management_(1)\\WebContent\\resources\\images\\"
+						fileItem.write(new File( "C:\\Users\\fehad\\eclipse-workspace\\Ticket_management\\WebContent\\resources\\images\\"+ fileItem.getName()));
 					}
 				}
 			}

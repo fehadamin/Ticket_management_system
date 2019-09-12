@@ -99,7 +99,7 @@
 				<td><%=t.getAssignee()%></td>
 				<td><%=t.getReporter()%></td>
 				<td><%=t.getStatus()%></td>
-				<td><%=t.getResolution()%></td>
+				<td><%=t.getDueDate()%></td>
 				<td><%=t.getCreated()%> </td>
 				<td><%=t.getUpdated() %></td>
 				<td><a

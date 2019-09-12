@@ -380,6 +380,7 @@ margin-bottom:20px;
 .form-group{
     width:100%;
     margin-bottom: 1em;
+    position:relative;
 }
 .form-group label{
     font-size:12px;
@@ -402,6 +403,7 @@ margin-bottom:20px;
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
+    
 }
 .form-btn{
     padding: 10px 15px;
@@ -441,7 +443,7 @@ background-color: #0e89ce;
 }
 .filterstext{
 	
-	background-color: #243544;
+  background-color: #243544;
   border: none;
   color: white;
   padding: 5px 16px;
@@ -453,4 +455,41 @@ background-color: #0e89ce;
   
 	
 	
+}
+.error{
+	border:1px solid #e20bob;
+}
+.success{
+	border: 1px solid #38b953;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltiptext {
+  visibility: hidden;
+  min-width: 220px;
+  background: #ef6060c7;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 1;
+  top: -10px;
+  right: 0;
+  
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }

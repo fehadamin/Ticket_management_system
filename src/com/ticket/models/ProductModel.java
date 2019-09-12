@@ -131,13 +131,13 @@ public class ProductModel implements ProductDao,SqlQueries {
 	}
 
 	public Product getByName(String name) {
-		Product p=new Product();
+		Product p=null;
 		try {
 			prep=conn.prepareStatement("SELECT * FROM products WHERE product_name = ?");
 			prep.setString(1, name);
 			result=prep.executeQuery();
 			while(result.next())
-			{
+			{	p = new Product();
 				p.setProductId(result.getInt("product_id"));
 				p.setProductName(result.getString("product_name"));
 				p.setDefaultAssignee(result.getString("default_assignee"));

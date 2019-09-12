@@ -1,5 +1,108 @@
-function ticket_validation() {
+$('#downloadReport').on("click",function(){
+	$("#mytable").table2excel({
+		exclude: ".noExl",
+		name:"Worksheet Name",
+		filename:"xyz",
+		fileext: '.txt',
+		preserveColors :true,
+	});
+});
+$("#dueDate" ).datepicker({
+	changeMonth:true,
+	changeYear:true,
+	numberOfMonths:1,
+	//minDate:0,
+	dateFormat: 'dd-mm-yy'
+});
+$("#createdDate" ).datepicker({
+	changeMonth:true,
+	changeYear:true,
+	numberOfMonths:1,
+	//minDate:0,
+	dateFormat: 'dd-mm-yy'
+});
+// to display message in the dashboard
+function cookies_get(cookie_name)
+{
+	var name = cookie_name + "=";
+	var dCookie = decodeURIComponent(document.cookie);
+	var ca = dCookie.split(';');
+	for(var i = 0;i<ca.length;i++){
+		var c = ca[i];
+		while(c.charAt(0) == ' '){
+			c = c.substring(1);
+			
+		}
+		if(c.indexOf(name) == 0){
+			return c.substring(name.length,c.length);
+		}
+	}
+	return "";
+}
+let message = cookies_get("message");
+console.log("message",message);
+if(message != "" && message != null)
+	{
+		$(".alert").css("display","block");
+		message = message.replace(/_/g," ");
+		console.log(message);
+		$(".alert").html(message);
+	}
+// component product matching
+ $(function() {
+        $("#product").change(function(){
+            var element = $(this);
+            var id = element.val();
+            $("#comp option").each(function(i){
+            	var element = $(this);
+	            var pid = element.attr("data-parent");
+	            $(this).css("display","none");
+	            if(pid == id){
+	            	$(this).css("display","block");
+	            }
+            });
+            
+        });
+});
+//
+////component product matching
+// $(function() {
+//        $("#comp").change(function(){
+//            var element = $(this);
+//            var cid = element.val();
+//            var pid = $("#product").val();
+//            $("#assignee option").each(function(i){
+//            	var element = $(this);
+//	            var pids = element.attr("data-assigned");
+//	            $(this).css("display","none");
+//	            console.log(pids);
+//	            pids = pids.split(',');
+//	            console.log(pids);
+////	            if(pid == id){
+////	            	$(this).css("display","block");
+////	            }
+//            });
+//            
+//        });
+//});
+ 
+$('#mytable').DataTable();
 
+// ticket form on submit handler
+$("#ticketForm").on("submit",function(e){
+	e.preventDefault();
+	if($(this).attr('data-form-type') == 'create'){
+		ticket_validation(e);
+	}
+	else{
+		ticket_edit_validation(e);
+	}	
+	
+});
+
+
+function ticket_validation(e) {
+	
 	var flag = 0;
 	var tickettype = document.getElementById("tickett").value;
 	var departmentname = document.getElementById("departmentname").value;
@@ -8,11 +111,29 @@ function ticket_validation() {
 	var priority = document.getElementById("priority").value;
 	var assignee = document.getElementById("assignee").value;
 	var reporter = document.getElementById("reporter").value;
+	var dueDate = document.getElementById("dueDate").value;
+	//var createdDate = document.getElementById("createdDate").value;
 	var message;
 
+	var today = new Date();
+
+	if(Date.parse(dueDate) < today){
+		message = "due date is incorrect";
+		document.getElementById("dueDate-tip").style.visibility = 'visible';
+		flag = 1;
+	}
+	else{
+		document.getElementById("dueDate-tip").style.visibility = 'hidden';
+	}
+	
 	if (reporter == 0) {
 		message = "select reporter type";
-		flag = 1
+		document.getElementById("reporter").class = "form-control error";
+		document.getElementById("reporter-tip").style.visibility = 'visible';
+		
+		flag = 1;
+	}else{
+		document.getElementById("reporter-tip").style.visibility = 'hidden';
 	}
 
 //	if (assignee == 0) {
@@ -22,38 +143,165 @@ function ticket_validation() {
 
 	if (priority == 0) {
 		message = "select priority type";
-		flag = 1
+		document.getElementById("priority").class = "form-control error";
+		document.getElementById("priority-tip").style.visibility = 'visible';
+		flag = 2
+	}else{
+		document.getElementById("priority-tip").style.visibility = 'hidden';
 	}
 
 	if (component == 0) {
 		message = "select component type";
-		flag = 1
+		document.getElementById("comp").class = "form-control error";
+		document.getElementById("comp-tip").style.visibility = 'visible';
+		flag = 3;
+	}else{
+		document.getElementById("comp-tip").style.visibility = 'hidden';
 	}
+	
 	if (product == 0) {
 		message = "select product type";
+		document.getElementById("product").class = "form-control error";
+		document.getElementById("product-tip").style.visibility = 'visible';
 		//flag = 1
+	}else{
+		document.getElementById("product-tip").style.visibility = 'hidden';
 	}
 
 	if (departmentname == 0) {
 		message = "select departmentname field";
+		document.getElementById("departmentname").class = "form-control error";
+		document.getElementById("departmentname-tip").style.visibility = 'visible';
+		flag = 5;
+	}else{
+		document.getElementById("departmentname-tip").style.visibility = 'hidden';
+	}
+	
+
+	if (tickettype == 0) {
+		message = "select ticket type";
+		document.getElementById("tickett").class = "form-control error";
+		document.getElementById("tickett-tip").style.visibility = 'visible';
+		flag = 6;
+	}else{
+		document.getElementById("tickett-tip").style.visibility = 'hidden';
+	}
+	
+	
+	
+	if (flag > 0) {
+		alert(message);
+		document.getElementById('eresult').innerHTML = message;
+		document.getElementById('eresult2').innerHTML = message;
+		return false;
+	}else {
+		/////
+		$(".form-btn").attr("disabled",true);
+		$.post($('#ticketForm').attr("action"),$('#ticketForm').serialize(),function(result){
+				
+			var url = document.getElementById("url").value;
+			if(result){
+				console.log(result);
+				window.location = url;
+			}
+			
+		});
+	}
+	
+}
+
+function ticket_edit_validation(e){
+	
+	var flag = 0;
+	var tickettype = document.getElementById("tickett").value;
+	var product = document.getElementById("product").value;
+	var component = document.getElementById("comp").value;
+	var priority = document.getElementById("priority").value;
+	var assignee = document.getElementById("assignee").value;
+	var reporter = document.getElementById("reporter").value;
+	var dueDate = document.getElementById("dueDate").value;
+	var createdDate = document.getElementById("createdDate").value;
+	var message;
+
+	var today = new Date();
+
+	if(Date.parse(dueDate) < today){
+		message = "due date is incorrect";
+		document.getElementById("dueDate-tip").style.visibility = 'visible';
 		flag = 1;
+	}
+	else{
+		document.getElementById("dueDate-tip").style.visibility = 'hidden';
+	}
+	
+	if (reporter == 0) {
+		message = "select reporter type";
+		document.getElementById("reporter").class = "form-control error";
+		document.getElementById("reporter-tip").style.visibility = 'visible';
+		
+		flag = 1;
+	}else{
+		document.getElementById("reporter-tip").style.visibility = 'hidden';
+	}
+
+	if (priority == 0) {
+		message = "select priority type";
+		document.getElementById("priority").class = "form-control error";
+		document.getElementById("priority-tip").style.visibility = 'visible';
+		flag = 2
+	}else{
+		document.getElementById("priority-tip").style.visibility = 'hidden';
+	}
+
+	if (component == 0) {
+		message = "select component type";
+		document.getElementById("comp").class = "form-control error";
+		document.getElementById("comp-tip").style.visibility = 'visible';
+		flag = 3;
+	}else{
+		document.getElementById("comp-tip").style.visibility = 'hidden';
+	}
+	
+	if (product == 0) {
+		message = "select product type";
+		document.getElementById("product").class = "form-control error";
+		document.getElementById("product-tip").style.visibility = 'visible';
+		//flag = 1
+	}else{
+		document.getElementById("product-tip").style.visibility = 'hidden';
 	}
 
 	if (tickettype == 0) {
 		message = "select ticket type";
-		flag = 1
+		document.getElementById("tickett").class = "form-control error";
+		document.getElementById("tickett-tip").style.visibility = 'visible';
+		flag = 6;
+	}else{
+		document.getElementById("tickett-tip").style.visibility = 'hidden';
 	}
-
-	if (flag == 1) {
-
+	
+	if (flag > 0) {
+		alert(message);
 		document.getElementById('eresult').innerHTML = message;
 		document.getElementById('eresult2').innerHTML = message;
-
 		return false;
-	} else {
-		return true;
+	}else {
+		$(".form-btn").attr("disabled",true);
+		$.post($('#ticketForm').attr("action"),$('#ticketForm').serialize(),function(result){
+				
+			var url = document.getElementById("url").value;
+			if(result){
+				console.log(result);
+				window.location = url;
+			}
+			
+		});
 	}
+	
+	
+	
 }
+
 
 function department_validation(e) {
 	var departmentname = document.getElementById('departmentname').value;
@@ -159,13 +407,6 @@ function employee_validation() {
 		message = "name should be greater than 4";
 		flag = 1
 	}
-	
-
-	
-	
-	
-
-
 
 	
 	if (flag == 1) {
@@ -196,3 +437,9 @@ function tickettypevalidation() {
 	}
 
 }
+
+
+
+
+
+

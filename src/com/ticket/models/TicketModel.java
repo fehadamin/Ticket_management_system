@@ -32,7 +32,48 @@ public class TicketModel implements TicketDao,SqlQueries{
 	}
 
 	
-	
+	@Override
+	public int insert(Ticket t) throws ParseException, TicketException {
+		// TODO Auto-generated method stub
+		SimpleDateFormat format = new SimpleDateFormat("dd-M-yy");
+		int flag = 0;
+		try {
+			prep = conn.prepareStatement(INSERT_TICKET,Statement.RETURN_GENERATED_KEYS);
+			prep.setString(1, t.getTicketKey());
+			prep.setInt(2, t.getTicketTypeId());
+			prep.setInt(3, t.getProductId());
+			prep.setString(4, t.getSummary());
+			prep.setString(5, t.getAssignee());
+			prep.setString(6, t.getReporter());
+			prep.setString(7, t.getPriority());
+			prep.setString(8, t.getStatus());
+			prep.setString(9, t.getResolution());
+			
+			Date due = format.parse(t.getDueDate());
+			java.sql.Date sDue = new java.sql.Date(due.getTime());
+			prep.setDate(10,sDue);
+			//prep.setString(11, t.getCreated());
+			//prep.setString(12, t.getUpdated());
+			prep.setInt(11, t.getComponent());
+			prep.setString(12, t.getProducts());
+			flag = prep.executeUpdate();
+			
+			result = prep.getGeneratedKeys();
+			while(result.next()) {
+				flag = result.getInt(1);
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new TicketException("insert exception "); 
+			//e.printStackTrace();
+		}
+
+		return flag;
+	}
+
+
 	@Override
 	public List<Ticket> getAll() throws TicketException {
 		// TODO Auto-generated method stub
@@ -146,6 +187,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 	public int updateById(int ticketId, Ticket t) throws ParseException, TicketException {
 		// TODO Auto-generated method stub
 		SimpleDateFormat format = new SimpleDateFormat("yy-M-dd");
+		SimpleDateFormat format1 = new SimpleDateFormat("dd-M-yy");
 		int flag = 0;
 		try {
 			prep = conn.prepareStatement(UPDATE_TICKET);
@@ -158,10 +200,12 @@ public class TicketModel implements TicketDao,SqlQueries{
 			prep.setString(7, t.getPriority());
 			prep.setString(8, t.getStatus());
 			prep.setString(9, t.getResolution());
-			Date due = format.parse(t.getDueDate());
+			Date due = format1.parse(t.getDueDate());
 			java.sql.Date sDue = new java.sql.Date(due.getTime());
 			prep.setDate(10,sDue);
-			prep.setString(11, t.getCreated());
+			Date created = format1.parse(t.getCreated());
+			java.sql.Date sCreated = new java.sql.Date(created.getTime());
+			prep.setDate(11, sCreated);
 			prep.setString(12, t.getUpdated());
 			prep.setInt(13, t.getComponent());
 			prep.setInt(14, t.getTicketId());
@@ -192,47 +236,7 @@ public class TicketModel implements TicketDao,SqlQueries{
 		
 		return flag;
 	}
-	@Override
-	public int insert(Ticket t) throws ParseException, TicketException {
-		// TODO Auto-generated method stub
-		SimpleDateFormat format = new SimpleDateFormat("dd-M-yy");
-		int flag = 0;
-		try {
-			prep = conn.prepareStatement(INSERT_TICKET,Statement.RETURN_GENERATED_KEYS);
-			prep.setString(1, t.getTicketKey());
-			prep.setInt(2, t.getTicketTypeId());
-			prep.setInt(3, t.getProductId());
-			prep.setString(4, t.getSummary());
-			prep.setString(5, t.getAssignee());
-			prep.setString(6, t.getReporter());
-			prep.setString(7, t.getPriority());
-			prep.setString(8, t.getStatus());
-			prep.setString(9, t.getResolution());
-			
-			Date due = format.parse(t.getDueDate());
-			java.sql.Date sDue = new java.sql.Date(due.getTime());
-			prep.setDate(10,sDue);
-			//prep.setString(11, t.getCreated());
-			//prep.setString(12, t.getUpdated());
-			prep.setInt(11, t.getComponent());
-			prep.setString(12, t.getProducts());
-			flag = prep.executeUpdate();
-			
-			result = prep.getGeneratedKeys();
-			while(result.next()) {
-				flag = result.getInt(1);
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			throw new TicketException("insert exception "); 
-			//e.printStackTrace();
-		}
-
-		return flag;
-	}
-
-	@Override
+		@Override
 	public Ticket getById(int ticketId) throws TicketException {
 		// TODO Auto-generated method stub
 		Ticket t = new Ticket();

@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="<%=Url%>resources/css/create_ticket.css" />
 	<link rel="stylesheet" href="<%=Url%>resources/css/common.css" />
 	<link rel="stylesheet" href="<%=Url%>resources/css/jqueryui.css" />	
+	<link rel="stylesheet" href="<%=Url%>resources/css/grid.css" />	
 		
 </head>
 <body>
@@ -55,118 +56,6 @@
   
 <script src="<%=Url%>resources/js/main.js"></script>
 <script src="<%=Url%>resources/js/validations.js"></script>
-
-
-<script>
-		
-		$('#downloadReport').on("click",function(){
-			
-			$("#mytable").table2excel({
-				exclude: ".noExl",
-				name:"Worksheet Name",
-				filename:"xyz",
-				fileext: '.txt',
-				preserveColors :true,
-				
-				
-				
-			});
-			
-		});
-
-
-		
-		$("#dueDate" ).datepicker({
-			changeMonth:true,
-			numberOfMonths:1,
-			minDate:0,
-			dateFormat: 'dd-mm-yy'
-			});
-		
-		
-		
-		// to display message in the dashboard
-		function cookies_get(cookie_name)
-		{
-			var name = cookie_name + "=";
-			var dCookie = decodeURIComponent(document.cookie);
-			var ca = dCookie.split(';');
-			
-			for(var i = 0;i<ca.length;i++){
-				var c = ca[i];
-				while(c.charAt(0) == ' '){
-					c = c.substring(1);
-					
-				}
-				if(c.indexOf(name) == 0){
-					return c.substring(name.length,c.length);
-				}
-			}
-			
-			return "";
-			
-			
-			
-		}
-		
-		
-		let message = cookies_get("message");
-		console.log("message",message);
-		if(message != "" && message != null)
-			{
-				$(".alert").css("display","block");
-				message = message.replace(/_/g," ");
-				console.log(message);
-				$(".alert").html(message);
-			}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		// component product matching
-		
-		 $(function() {
-		        $("#product").change(function(){
-		            var element = $(this);
-		            var id = element.val();
-					
-		            $("#comp option").each(function(i){
-		            	var element = $(this);
-			            var pid = element.attr("data-parent");
-			            $(this).css("display","none");
-			            if(pid == id){
-			            	$(this).css("display","block");
-			            }
-		                
-		            });
-		            
-		        });
-	    });
-		 $('#mytable').DataTable();
-</script>
 
 
 

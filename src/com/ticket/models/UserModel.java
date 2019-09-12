@@ -35,7 +35,7 @@ public class UserModel implements UserDao,SqlQueries {
 		prep = conn.prepareStatement("select * from users where name=? ");
 		prep.setString(1, name);
 		result=prep.executeQuery();
-	
+		
 		if (result.next() == false) {
 			flag=1;
 			//System.out.println("rs is   empty");
@@ -69,6 +69,7 @@ public class UserModel implements UserDao,SqlQueries {
 				u.setRole(result.getString("role"));
 				u.setDepartmentId(result.getInt("department_id"));
 				u.setHomeCompany(result.getString("home_company"));
+				u.setProducts_assigned(result.getString("products_assigned"));
 				u.setCreated(result.getString("created"));
 				user.add(u);
 				
@@ -102,6 +103,7 @@ public class UserModel implements UserDao,SqlQueries {
 				u.setRole(result.getString("role"));
 				u.setDepartmentId(result.getInt("department_id"));
 				u.setHomeCompany(result.getString("home_company"));
+				u.setProducts_assigned(result.getString("products_assigned"));
 				u.setCreated(result.getString("created"));
 			
 			
@@ -134,6 +136,7 @@ List<User> user = new ArrayList<>();
 				u.setRole(result.getString("role"));
 				u.setDepartmentId(result.getInt("department_id"));
 				u.setHomeCompany(result.getString("home_company"));
+				u.setProducts_assigned(result.getString("products_assigned"));
 				u.setCreated(result.getString("created"));
 				user.add(u);
 				

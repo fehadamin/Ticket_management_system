@@ -10,7 +10,7 @@
 
 
     <div class="res-tab">
-        <h1>  all  ticket table</h1>
+        <h1>  all  employee table</h1>
        <!--  <button id="downloadReport">Download</button>  id="mytable" -->
         <table class="myTable" >
             <thead>
@@ -19,6 +19,7 @@
                     <th> email</th>
                     <th> homecompany</th>
                     <th> role</th>   
+                    <th> Assigned to</th>
                     <th>Action</th>
                     
                
@@ -34,6 +35,7 @@
 						
 						<td><%=t.getHomeCompany()%></td>
 						<td><%=t.getRole()%></td>
+						<td><%=t.getProducts_assigned()%></td>
 						<td>
 							<a href="<%=Url%>admin-employee-edit-form.htm?id=<%=t.getUserId()%>">edit</a>
 							<a href="<%=Url%>admin-employee-remove.htm?id=<%=t.getUserId()%>">delete</a>
