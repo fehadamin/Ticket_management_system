@@ -458,7 +458,7 @@ public class FrontController extends HttpServlet {
 					request.setAttribute("parents", pm.getAll());
 				} catch (ProductException e) {
 					// TODO Auto-generated catch block
-					cookie.setValue("Excption_in_product");
+					cookie.setValue("Exception_in_product");
 					// e.printStackTrace();
 				}
 				request.setAttribute("pageName", "create_product");
@@ -1828,25 +1828,30 @@ public class FrontController extends HttpServlet {
 			List<String> msgs = new ArrayList<String>();
 			
 			TicketModel ticketModel = new TicketModel();
-			Cookie cookie = new Cookie("message","rows_uploaded_successfully");
+			Cookie cookie = new Cookie("message","");
 			cookie.setMaxAge(10);
+			int succ=0;
 			for(int i = 1;i<list.size();i++) {
 				List<Object> data = validateRow((ArrayList)list.get(i));
 				String msg = (String) data.get(0);
 				Ticket t = (Ticket) data.get(1);
 				msgs.add(msg);
+				
 				if(msg == "") {
 					int flag = ticketModel.isAlreadyExist(t);
 					if(flag == 1){
 						try {
 							ticketModel.insert(t);
+							succ++;
 							System.out.println("store\t" + t.toString());
+							cookie.setValue(succ+"_row_uploaded_successfully");
 						} catch (TicketException e) {
-							cookie.setValue("Ticket_already_exist");
+							//cookie.setValue("Ticket_already_exist");
 							// e.printStackTrace();
 						}
 					}
 				}
+				
 				
 			}
 			
@@ -1996,6 +2001,7 @@ public class FrontController extends HttpServlet {
 	private List<Object> validateRow(List<String> row) {
 		
 		TicketTypesModel ttm = new TicketTypesModel();
+		TicketModel ticketModel = new TicketModel();
 		ProductModel pm = new ProductModel();
 		UserModel um = new UserModel();
 		int max = row.size();
@@ -2033,7 +2039,7 @@ public class FrontController extends HttpServlet {
 			try {
 				Product p = pm.getByName(row.get(3));
 				if(p != null) 
-					t.setProductId(p.getProductId());
+					t.setComponent(p.getProductId());
 				else 
 					message = message + ", Component not found";
 			}catch(Exception e) {
@@ -2041,6 +2047,8 @@ public class FrontController extends HttpServlet {
 			}
 			
 		}else {
+			t.setComponent(0);
+			t.setProductId(0);
 			//message += "nd";
 		}
 		
@@ -2084,13 +2092,22 @@ public class FrontController extends HttpServlet {
 			message = message + ", Reporter not found";
 		}
 		
+		
+		
 		// ticket key	
 		int k = -1;
 		k = row.get(0).indexOf('-');// key
 		if (k < 0) {
 			message = message + ", Ticket key incorrect";
+			
 		}else {
-			t.setTicketKey(row.get(0));
+			k = ticketModel.isKeyExist(row.get(0));
+			if(k == 1) {
+				t.setTicketKey(row.get(0));
+			}else {
+				message = message + ", Ticket key already exist";
+			}
+			
 		}
 		
 		// summary
@@ -2098,14 +2115,16 @@ public class FrontController extends HttpServlet {
 		t.setProducts("0");
 		// dates
 		try {
-			java.util.Date due = new SimpleDateFormat("dd/MM/yyyy").parse(row.get(9));
-			java.util.Date created = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(row.get(10));
-			java.util.Date updated = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(row.get(11));
-			
-			if(Util.getDays(row.get(10), row.get(9)) > 0) {
+			java.util.Date due = new SimpleDateFormat("MM/dd/yyyy").parse(row.get(9));
+			java.util.Date created = new SimpleDateFormat("MM/dd/yyyy HH:mm").parse(row.get(10));
+			java.util.Date updated = new SimpleDateFormat("MM/dd/yyyy HH:mm").parse(row.get(11));
+			int days = (int) Util.getDays(row.get(10), row.get(9));
+			if(days > 0) {
 				t.setDueDate(new SimpleDateFormat("dd-M-yy").format(due));
 				t.setCreated(new SimpleDateFormat("dd-M-yy HH:mm:ss").format(created));
 				t.setUpdated(new SimpleDateFormat("dd-M-yy HH:mm:ss").format(updated));
+			}else {
+				message = message + " "+ days + ", Problem in due date >= created date";
 			}
 			
 		} catch (Exception e) {
@@ -2114,7 +2133,7 @@ public class FrontController extends HttpServlet {
 		}
 		
 		
-		TicketModel ticketModel = new TicketModel();
+		
 		int f = ticketModel.isAlreadyExist(t);
 		if(f==0) {
 			message = message + ", Duplicate ticket";

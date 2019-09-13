@@ -556,7 +556,27 @@ public class TicketModel implements TicketDao,SqlQueries{
 
 		return ticket;
 	}
-
+	
+	public int isKeyExist(String key) {
+		int flag= 0;
+		try {
+			prep = conn.prepareStatement("SELECT * FROM tickets WHERE ticket_key = ?");
+			prep.setString(1,key);
+			result = prep.executeQuery();
+			//System.out.println(prep.toString());
+			if (result.next() == false) {
+				flag = 1;// empty
+				System.out.println("rs is  empty");
+			}else {
+				System.out.println("rs avaiable");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return flag;
+		
+	}
 	public int isAlreadyExist(Ticket t) {
 		int flag= 0;
 		try {

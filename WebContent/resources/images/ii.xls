@@ -1,0 +1,37 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+
+<table id="mytable" class="myTable">
+		<thead>
+			<!--  <th> Key</th> -->
+			<th>ticket key</th>
+			<th>ticket type</th>
+			<th>product</th>
+			<th>Component</th>
+			<th>summary</th>
+			<th>priority</th>
+			<th>Assignee</th>
+			<th>Reporter</th>
+			<th>status</th>
+			<th>Resolution</th>
+			<th>created</th>
+			<th>updated</th>
+			<th>Message</th>
+
+
+		</thead>
+		<tbody>
+			
+		</tbody>
+	</table>
+
+
+</body>
+</html>

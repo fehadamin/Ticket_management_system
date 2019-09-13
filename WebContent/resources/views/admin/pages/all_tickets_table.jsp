@@ -102,8 +102,8 @@
 				<td><%=t.getDueDate()%></td>
 				<td><%=t.getCreated()%> </td>
 				<td><%=t.getUpdated() %></td>
-				<td><a
-					href="<%=Url%>admin-ticket-edit-form.htm?id=<%=t.getTicketId()%>">edit</a>
+				<td><%-- <a
+					href="<%=Url%>admin-ticket-edit-form.htm?id=<%=t.getTicketId()%>">edit</a> --%>
 					<a href="<%=Url%>admin-ticket-remove.htm?id=<%=t.getTicketId()%>">delete</a>
 				</td>
 

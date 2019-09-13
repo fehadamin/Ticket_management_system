@@ -53,7 +53,7 @@
 				<%
 					}
 				%>
-			</select> <span class="tooltiptext" id="departmentname-tip">Please select one</span>
+			</select> <span class="tooltiptext" id="departmentname-tip">Please select department</span>
 		</div>
 
 		<div class="form-group">
@@ -70,7 +70,7 @@
 					}
 					}
 				%>
-			</select> <span class="tooltiptext" id="product-tip">Please select one</span>
+			</select> <span class="tooltiptext" id="product-tip">Please select product</span>
 			<div id="pds" style="display: none;">
 				<%
 					for (Product d : products) {
@@ -100,7 +100,7 @@
 					}
 					}
 				%>
-			</select> <span class="tooltiptext" id="comp-tip">Please select one</span>
+			</select> <span class="tooltiptext" id="comp-tip">Please select component</span>
 		</div>
 
 
@@ -120,7 +120,7 @@
 				<option value="Blocker">Blocker</option>
 				<option value="Critical">Critical</option>
 				<option value="Major">Major</option>
-			</select> <span class="tooltiptext" id="priority-tip">Please select one</span>
+			</select> <span class="tooltiptext" id="priority-tip">Please select priority</span>
 		</div>
 
 		<div class="form-group">

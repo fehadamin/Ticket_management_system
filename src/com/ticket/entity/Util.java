@@ -7,8 +7,8 @@ public class Util {
 	public static long getDays(String dateStart,String dateStop) {
 
 		//HH converts hour in 24 hours format (0-23), day calculation
-		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		SimpleDateFormat f1 = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat f1 = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 		
 
 		Date d1 = null;

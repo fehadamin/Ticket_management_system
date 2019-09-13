@@ -65,26 +65,33 @@ if(message != "" && message != null)
         });
 });
 //
-////component product matching
-// $(function() {
-//        $("#comp").change(function(){
-//            var element = $(this);
-//            var cid = element.val();
-//            var pid = $("#product").val();
-//            $("#assignee option").each(function(i){
-//            	var element = $(this);
-//	            var pids = element.attr("data-assigned");
-//	            $(this).css("display","none");
-//	            console.log(pids);
-//	            pids = pids.split(',');
-//	            console.log(pids);
-////	            if(pid == id){
-////	            	$(this).css("display","block");
-////	            }
-//            });
-//            
-//        });
-//});
+//component product matching
+$(function() {
+        $("#comp").change(function(){
+            var element = $(this);
+            var cid = element.val();
+            var pid = $("#product").val();
+            $("#assignee option").each(function(i){
+            	if($(this).val() != 0){
+            		var option = $(this);
+    	            var pids = option.attr("data-assigned");
+    	            $(this).css("display","none");
+    	            pids = pids.split(',');
+    	            
+    	            var index= 0;
+    	            while (index < pids.length) { 
+    	                console.log(pids[index]); 
+    	                if(pids[index] == cid || pids[index] == pid){
+    	                	$(this).css("display","block");
+    	                }
+    	                index++; 
+    	            }
+            	}
+	    
+            });
+            
+        });
+});
  
 $('#mytable').DataTable();
 
