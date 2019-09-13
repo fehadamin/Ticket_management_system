@@ -156,24 +156,29 @@ function ticket_validation(e) {
 	}else{
 		document.getElementById("priority-tip").style.visibility = 'hidden';
 	}
-
-	if (component == 0) {
+	
+	// checking for the PDCR
+	if(tickettype != 'PDCR'){
+		
+		if (component == 0) {
 		message = "select component type";
 		document.getElementById("comp").class = "form-control error";
 		document.getElementById("comp-tip").style.visibility = 'visible';
 		flag = 3;
-	}else{
-		document.getElementById("comp-tip").style.visibility = 'hidden';
+		}else{
+			document.getElementById("comp-tip").style.visibility = 'hidden';
+		}
+
+		if (product == 0) {
+			message = "select product type";
+			document.getElementById("product").class = "form-control error";
+			document.getElementById("product-tip").style.visibility = 'visible';
+			//flag = 1
+		}else{
+			document.getElementById("product-tip").style.visibility = 'hidden';
+		}
 	}
 	
-	if (product == 0) {
-		message = "select product type";
-		document.getElementById("product").class = "form-control error";
-		document.getElementById("product-tip").style.visibility = 'visible';
-		//flag = 1
-	}else{
-		document.getElementById("product-tip").style.visibility = 'hidden';
-	}
 
 	if (departmentname == 0) {
 		message = "select departmentname field";
